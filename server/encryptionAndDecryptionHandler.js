@@ -20,6 +20,7 @@ const encrypt = (password) => {
 const decrypt = (encryption) => {
   const decipher = crypto.createDecipheriv(
     'aes-256-ctr',
+    Buffer.from(secret),
     Buffer.from(encryption.iv, 'hex')
   );
 
