@@ -21,4 +21,9 @@ export const passwordService = {
 	deletePassword: async (id) => {
 		await axios.delete(`${API_BASE_URL}/delete-password/${id}`);
 	},
+
+	decryptPassword: async (encryptedData) => {
+		const response = await axios.post(`${API_BASE_URL}/decrypt-password`, encryptedData);
+		return response.data.password;
+	},
 };

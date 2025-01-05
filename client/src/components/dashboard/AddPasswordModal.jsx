@@ -22,7 +22,7 @@ const AddPasswordModal = ({ open, onClose }) => {
 
 	const [formData, setFormData] = useState({
 		website: '',
-		username: '',
+		credential: '',
 		password: '',
 		category: '',
 	});
@@ -74,8 +74,8 @@ const AddPasswordModal = ({ open, onClose }) => {
 					<TextField
 						fullWidth
 						label='Username/Email'
-						name='username'
-						value={formData.username}
+						name='credential'
+						value={formData.credential}
 						onChange={handleChange}
 						margin='normal'
 					/>

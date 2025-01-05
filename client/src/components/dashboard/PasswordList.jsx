@@ -4,9 +4,10 @@ import { Visibility, VisibilityOff, ContentCopy, Edit, Delete, Search } from '@m
 import { passwordService } from '../../services/passwordService';
 import EditPasswordModal from './EditPasswordModal';
 import { PasswordContext } from '../../context/PasswordContext';
+import { calculatePasswordStrength, getPasswordStrengthLabel } from '../../utils/passwordStrength';
 
 const PasswordList = () => {
-	const { passwords, setPasswords } = useContext(PasswordContext);
+	const { passwords, setPasswords, decryptedPasswords, setDecryptedPasswords } = useContext(PasswordContext);
 
 	const [searchTerm, setSearchTerm] = useState('');
 	const [showPassword, setShowPassword] = useState({});
@@ -18,6 +19,21 @@ const PasswordList = () => {
 			setLoading(true);
 			try {
 				const data = await passwordService.fetchPasswords();
+
+				// Decrypt each password
+				const decrypted = {};
+				for (const pass of data) {
+					try {
+						decrypted[pass.id] = await passwordService.decryptPassword({
+							password: pass.password,
+							iv: pass.iv,
+						});
+					} catch (err) {
+						console.error('Failed to decrypt password:', err);
+					}
+				}
+
+				setDecryptedPasswords(decrypted);
 				setPasswords(data);
 			} catch (error) {
 				console.error('Failed to fetch passwords:', error);
@@ -27,7 +43,7 @@ const PasswordList = () => {
 		};
 
 		loadPasswords();
-	}, [setPasswords]);
+	}, [setPasswords, setDecryptedPasswords]);
 
 	const handleCopyPassword = (password) => {
 		navigator.clipboard.writeText(password);
@@ -118,20 +134,26 @@ const PasswordList = () => {
 									<Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
 										<Typography variant='h6'>{password.website}</Typography>
 										<Chip
-											label={password.strength}
-											color={password.strength === 'strong' ? 'success' : 'error'}
+											label={getPasswordStrengthLabel(
+												calculatePasswordStrength(decryptedPasswords[password.id])
+											)}
+											color={
+												calculatePasswordStrength(decryptedPasswords[password.id]) > 75
+													? 'success'
+													: 'error'
+											}
 											size='small'
 											sx={{ textTransform: 'capitalize' }}
 										/>
 									</Box>
 
 									<Typography color='textSecondary' gutterBottom>
-										{password.username}
+										{password.credential}
 									</Typography>
 
 									<TextField
 										type={showPassword[password.id] ? 'text' : 'password'}
-										value={password.password}
+										value={decryptedPasswords[password.id] || '••••••••'}
 										InputProps={{
 											readOnly: true,
 											endAdornment: (
@@ -145,7 +167,7 @@ const PasswordList = () => {
 													</IconButton>
 													<IconButton
 														size='small'
-														onClick={() => handleCopyPassword(password.password)}
+														onClick={() => handleCopyPassword(decryptedPasswords[password.id])}
 														sx={{ mr: 0.5 }}
 													>
 														<ContentCopy />
@@ -185,7 +207,14 @@ const PasswordList = () => {
 			<EditPasswordModal
 				open={Boolean(editingPassword)}
 				onClose={() => setEditingPassword(null)}
-				passwordData={editingPassword}
+				passwordData={
+					editingPassword
+						? {
+								...editingPassword,
+								password: decryptedPasswords[editingPassword.id] || '',
+						  }
+						: null
+				}
 			/>
 		</Box>
 	);

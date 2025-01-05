@@ -1,16 +1,40 @@
-import { useState } from 'react';
+import { useState, useContext, useMemo } from 'react';
 import { Grid, Card, CardContent, Typography, Box, Button, Paper } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import PasswordList from './PasswordList';
 import AddPasswordModal from './AddPasswordModal';
+import { PasswordContext } from '../../context/PasswordContext';
+import { calculatePasswordStrength } from '../../utils/passwordStrength';
 
-const Dashboard = () => {
-	const [stats] = useState({
-		totalPasswords: 12,
-		weakPasswords: 3,
-		reusedPasswords: 2,
-	});
+export default function Dashboard() {
+	const { passwords } = useContext(PasswordContext);
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+	const stats = useMemo(() => {
+		const decryptedPasswords = {};
+
+		const totalPasswords = passwords.length;
+
+		// Count weak passwords (strength <= 75)
+		const weakPasswords = passwords.reduce((count, pass) => {
+			const strength = calculatePasswordStrength(decryptedPasswords[pass.id]);
+			return count + (strength <= 75 ? 1 : 0);
+		}, 0);
+
+		// Count reused passwords
+		const passwordCounts = Object.values(decryptedPasswords).reduce((acc, password) => {
+			acc[password] = (acc[password] || 0) + 1;
+			return acc;
+		}, {});
+
+		const reusedPasswords = Object.values(passwordCounts).filter((count) => count > 1).length;
+
+		return {
+			totalPasswords,
+			weakPasswords,
+			reusedPasswords,
+		};
+	}, [passwords]);
 
 	return (
 		<Box>
@@ -89,6 +113,4 @@ const Dashboard = () => {
 			<AddPasswordModal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
 		</Box>
 	);
-};
-
-export default Dashboard;
+}

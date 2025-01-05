@@ -24,12 +24,12 @@ const db = mysql2.createConnection({
 
 // Create new password
 app.post('/add-password', (req, res) => {
-	const { password, website } = req.body;
+	const { password, website, credential, category } = req.body;
 	const encryptedPassword = encrypt(password);
 
 	db.query(
-		'INSERT INTO passwords (password, website, iv) VALUES (?,?,?)',
-		[encryptedPassword.password, website, encryptedPassword.iv],
+		'INSERT INTO passwords (password, website, iv, credential, category) VALUES (?,?,?,?,?)',
+		[encryptedPassword.password, website, encryptedPassword.iv, credential, category],
 		(err, result) => {
 			if (err) {
 				console.error('Error adding password:', err);
@@ -39,6 +39,8 @@ app.post('/add-password', (req, res) => {
 					id: result.insertId,
 					website,
 					password,
+					credential,
+					category,
 					iv: encryptedPassword.iv,
 				});
 			}
@@ -61,12 +63,12 @@ app.get('/passwords', (_, res) => {
 // Update existing password
 app.put('/update-password/:id', (req, res) => {
 	const { id } = req.params;
-	const { password, website } = req.body;
+	const { password, website, credential, category } = req.body;
 	const encryptedPassword = encrypt(password);
 
 	db.query(
-		'UPDATE passwords SET password = ?, website = ?, iv = ? WHERE id = ?',
-		[encryptedPassword.password, website, encryptedPassword.iv, id],
+		'UPDATE passwords SET password = ?, website = ?, iv = ?, credential = ?, category = ? WHERE id = ?',
+		[encryptedPassword.password, website, encryptedPassword.iv, credential, category, id],
 		(err, result) => {
 			if (err) {
 				console.error('Error updating password:', err);
@@ -78,6 +80,8 @@ app.put('/update-password/:id', (req, res) => {
 					id,
 					website,
 					password,
+					credential,
+					category,
 					iv: encryptedPassword.iv,
 				});
 			}

@@ -21,7 +21,7 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 
 	const [formData, setFormData] = useState({
 		website: '',
-		username: '',
+		credential: '',
 		password: '',
 		category: '',
 	});
@@ -32,7 +32,7 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 		if (passwordData) {
 			setFormData({
 				website: passwordData.website || '',
-				username: passwordData.username || '',
+				credential: passwordData.credential || '',
 				password: passwordData.password || '',
 				category: passwordData.category || '',
 			});
@@ -65,7 +65,6 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 		try {
 			const updatedPassword = await passwordService.updatePassword(passwordData.id, {
 				...formData,
-				strength: passwordStrength > 75 ? 'strong' : 'weak',
 			});
 
 			setPasswords(
@@ -95,8 +94,8 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 					<TextField
 						fullWidth
 						label='Username/Email'
-						name='username'
-						value={formData.username}
+						name='credential'
+						value={formData.credential}
 						onChange={handleChange}
 						margin='normal'
 					/>
