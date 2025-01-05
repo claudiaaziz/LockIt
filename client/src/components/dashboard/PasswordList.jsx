@@ -151,43 +151,56 @@ const PasswordList = () => {
 										{password.credential}
 									</Typography>
 
-									<TextField
-										type={showPassword[password.id] ? 'text' : 'password'}
-										value={decryptedPasswords[password.id] || '••••••••'}
-										InputProps={{
-											readOnly: true,
-											endAdornment: (
-												<InputAdornment position='end'>
-													<IconButton
-														size='small'
-														onClick={() => handleTogglePassword(password.id)}
-														sx={{ mr: 0.5 }}
-													>
-														{showPassword[password.id] ? <VisibilityOff /> : <Visibility />}
-													</IconButton>
-													<IconButton
-														size='small'
-														onClick={() => handleCopyPassword(decryptedPasswords[password.id])}
-														sx={{ mr: 0.5 }}
-													>
-														<ContentCopy />
-													</IconButton>
-												</InputAdornment>
-											),
-										}}
-										fullWidth
-										variant='outlined'
-										size='small'
-										sx={{
-											'& .MuiOutlinedInput-root': {
-												backgroundColor: 'white',
-											},
-										}}
-									/>
+									<form>
+										<TextField
+											type={showPassword[password.id] ? 'text' : 'password'}
+											value={decryptedPasswords[password.id] || '••••••••'}
+											InputProps={{
+												readOnly: true,
+												endAdornment: (
+													<InputAdornment position='end'>
+														<IconButton
+															size='small'
+															onClick={() => handleTogglePassword(password.id)}
+															sx={{ mr: 0.5 }}
+														>
+															{showPassword[password.id] ? <VisibilityOff /> : <Visibility />}
+														</IconButton>
+														<IconButton
+															size='small'
+															onClick={() => handleCopyPassword(decryptedPasswords[password.id])}
+															sx={{ mr: 0.5 }}
+														>
+															<ContentCopy />
+														</IconButton>
+													</InputAdornment>
+												),
+											}}
+											fullWidth
+											variant='outlined'
+											size='small'
+											autoComplete='off'
+											sx={{
+												'& .MuiOutlinedInput-root': {
+													backgroundColor: 'white',
+												},
+											}}
+										/>
+									</form>
 
 									<Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
 										<Typography variant='caption' color='textSecondary'>
-											Last updated: {new Date(password.lastUpdated).toLocaleDateString()}
+											{password.lastUpdated
+												? `Updated: ${new Date(password.lastUpdated).toLocaleDateString('en-US', {
+														year: 'numeric',
+														month: 'short',
+														day: 'numeric',
+												  })}`
+												: `Created: ${new Date(password.createdAt).toLocaleDateString('en-US', {
+														year: 'numeric',
+														month: 'short',
+														day: 'numeric',
+												  })}`}
 										</Typography>
 										<Box>
 											<IconButton size='small' sx={{ mr: 0.5 }} onClick={() => handleEdit(password)}>

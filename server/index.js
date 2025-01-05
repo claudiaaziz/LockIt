@@ -42,6 +42,7 @@ app.post('/add-password', (req, res) => {
 					credential,
 					category,
 					iv: encryptedPassword.iv,
+					lastUpdated: new Date().toISOString(),
 				});
 			}
 		}
@@ -55,6 +56,7 @@ app.get('/passwords', (_, res) => {
 			console.error('Error fetching passwords:', err);
 			res.status(500).json({ error: 'Failed to fetch passwords' });
 		} else {
+			console.log('Passwords from DB:', result);
 			res.json(result);
 		}
 	});
@@ -83,6 +85,7 @@ app.put('/update-password/:id', (req, res) => {
 					credential,
 					category,
 					iv: encryptedPassword.iv,
+					lastUpdated: new Date().toISOString(),
 				});
 			}
 		}

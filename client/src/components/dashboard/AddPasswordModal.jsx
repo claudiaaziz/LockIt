@@ -18,7 +18,7 @@ import { passwordService } from '../../services/passwordService';
 import { PasswordContext } from '../../context/PasswordContext';
 
 const AddPasswordModal = ({ open, onClose }) => {
-	const { passwords, setPasswords } = useContext(PasswordContext);
+	const { passwords, setPasswords, decryptedPasswords, setDecryptedPasswords } = useContext(PasswordContext);
 
 	const [formData, setFormData] = useState({
 		website: '',
@@ -45,76 +45,107 @@ const AddPasswordModal = ({ open, onClose }) => {
 		}
 	};
 
-	const handleSubmit = async () => {
+	const handleSubmit = async (e) => {
+		e.preventDefault();
 		try {
 			const newPassword = await passwordService.addPassword({
 				...formData,
-				strength: passwordStrength > 75 ? 'strong' : 'weak',
 			});
 			setPasswords([...passwords, newPassword]);
+			setDecryptedPasswords({
+				...decryptedPasswords,
+				[newPassword.id]: formData.password,
+			});
 			onClose();
+			setFormData({
+				website: '',
+				credential: '',
+				password: '',
+				category: '',
+			});
 		} catch (error) {
 			console.error('Failed to add password:', error);
 		}
 	};
 
+	const handleClose = () => {
+		setFormData({
+			website: '',
+			credential: '',
+			password: '',
+			category: '',
+		});
+		setPasswordStrength(0);
+		onClose();
+	};
+
 	return (
-		<Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
+		<Dialog open={open} onClose={handleClose} maxWidth='sm' fullWidth>
 			<DialogTitle>Add New Password</DialogTitle>
-			<DialogContent>
-				<Box sx={{ mt: 2 }}>
-					<TextField
-						fullWidth
-						label='Website'
-						name='website'
-						value={formData.website}
-						onChange={handleChange}
-						margin='normal'
-					/>
-					<TextField
-						fullWidth
-						label='Username/Email'
-						name='credential'
-						value={formData.credential}
-						onChange={handleChange}
-						margin='normal'
-					/>
-					<TextField
-						fullWidth
-						label='Password'
-						name='password'
-						type='password'
-						value={formData.password}
-						onChange={handleChange}
-						margin='normal'
-					/>
-
-					<Box sx={{ mt: 2, mb: 2 }}>
-						<Typography variant='caption'>Password Strength</Typography>
-						<LinearProgress
-							variant='determinate'
-							value={passwordStrength}
-							color={passwordStrength > 75 ? 'success' : passwordStrength > 50 ? 'warning' : 'error'}
+			<form onSubmit={handleSubmit}>
+				<DialogContent>
+					<Box sx={{ mt: 2 }}>
+						<TextField
+							fullWidth
+							label='Website'
+							name='website'
+							value={formData.website}
+							onChange={handleChange}
+							margin='normal'
+							required
+							InputLabelProps={{ required: false }}
 						/>
-					</Box>
+						<TextField
+							fullWidth
+							label='Username/Email'
+							name='credential'
+							value={formData.credential}
+							onChange={handleChange}
+							margin='normal'
+							required
+							autoComplete='username'
+							InputLabelProps={{ required: false }}
+						/>
+						<TextField
+							fullWidth
+							label='Password'
+							name='password'
+							type='password'
+							value={formData.password}
+							onChange={handleChange}
+							margin='normal'
+							required
+							autoComplete='new-password'
+							InputLabelProps={{ required: false }}
+						/>
 
-					<FormControl fullWidth margin='normal'>
-						<InputLabel>Category</InputLabel>
-						<Select name='category' value={formData.category} onChange={handleChange} label='Category'>
-							<MenuItem value='social'>Social Media</MenuItem>
-							<MenuItem value='finance'>Finance</MenuItem>
-							<MenuItem value='work'>Work</MenuItem>
-							<MenuItem value='personal'>Personal</MenuItem>
-						</Select>
-					</FormControl>
-				</Box>
-			</DialogContent>
-			<DialogActions>
-				<Button onClick={onClose}>Cancel</Button>
-				<Button onClick={handleSubmit} variant='contained' color='primary'>
-					Save Password
-				</Button>
-			</DialogActions>
+						<Box sx={{ mt: 2, mb: 2 }}>
+							<Typography variant='caption'>Password Strength</Typography>
+							<LinearProgress
+								variant='determinate'
+								value={passwordStrength}
+								color={passwordStrength > 75 ? 'success' : passwordStrength > 50 ? 'warning' : 'error'}
+							/>
+						</Box>
+
+						<FormControl fullWidth margin='normal'>
+							<InputLabel>Category</InputLabel>
+							<Select name='category' value={formData.category} onChange={handleChange} label='Category'>
+								<MenuItem value='social'>Social Media</MenuItem>
+								<MenuItem value='finance'>Finance</MenuItem>
+								<MenuItem value='work'>Work</MenuItem>
+								<MenuItem value='personal'>Personal</MenuItem>
+							</Select>
+						</FormControl>
+					</Box>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={handleClose}>Cancel</Button>
+					<Button type='submit' variant='contained' color='primary'>
+						Save Password
+					</Button>
+				</DialogActions>
+			</form>
 		</Dialog>
 	);
 };

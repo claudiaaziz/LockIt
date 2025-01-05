@@ -17,7 +17,7 @@ import { useState, useEffect, useContext } from 'react';
 import { passwordService } from '../../services/passwordService';
 import { PasswordContext } from '../../context/PasswordContext';
 const EditPasswordModal = ({ open, onClose, passwordData }) => {
-	const { passwords, setPasswords } = useContext(PasswordContext);
+	const { passwords, setPasswords, decryptedPasswords, setDecryptedPasswords } = useContext(PasswordContext);
 
 	const [formData, setFormData] = useState({
 		website: '',
@@ -61,7 +61,8 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 		}
 	};
 
-	const handleSubmit = async () => {
+	const handleSubmit = async (e) => {
+		e.preventDefault();
 		try {
 			const updatedPassword = await passwordService.updatePassword(passwordData.id, {
 				...formData,
@@ -72,6 +73,12 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 					password.id === passwordData.id ? { ...updatedPassword, id: passwordData.id } : password
 				)
 			);
+
+			setDecryptedPasswords({
+				...decryptedPasswords,
+				[passwordData.id]: formData.password,
+			});
+
 			onClose();
 		} catch (error) {
 			console.error('Failed to update password:', error);
@@ -81,60 +88,70 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 	return (
 		<Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
 			<DialogTitle>Edit Password</DialogTitle>
-			<DialogContent>
-				<Box sx={{ mt: 2 }}>
-					<TextField
-						fullWidth
-						label='Website'
-						name='website'
-						value={formData.website}
-						onChange={handleChange}
-						margin='normal'
-					/>
-					<TextField
-						fullWidth
-						label='Username/Email'
-						name='credential'
-						value={formData.credential}
-						onChange={handleChange}
-						margin='normal'
-					/>
-					<TextField
-						fullWidth
-						label='Password'
-						name='password'
-						type='text'
-						value={formData.password}
-						onChange={handleChange}
-						margin='normal'
-					/>
-
-					<Box sx={{ mt: 2, mb: 2 }}>
-						<Typography variant='caption'>Password Strength</Typography>
-						<LinearProgress
-							variant='determinate'
-							value={passwordStrength}
-							color={passwordStrength > 75 ? 'success' : passwordStrength > 50 ? 'warning' : 'error'}
+			<form onSubmit={handleSubmit}>
+				<DialogContent>
+					<Box sx={{ mt: 2 }}>
+						<TextField
+							fullWidth
+							label='Website'
+							name='website'
+							value={formData.website}
+							onChange={handleChange}
+							margin='normal'
+							required
+							InputLabelProps={{ required: false }}
 						/>
-					</Box>
+						<TextField
+							fullWidth
+							label='Username/Email'
+							name='credential'
+							value={formData.credential}
+							onChange={handleChange}
+							margin='normal'
+							required
+							autoComplete='username'
+							InputLabelProps={{ required: false }}
+						/>
+						<TextField
+							fullWidth
+							label='Password'
+							name='password'
+							type='password'
+							value={formData.password}
+							onChange={handleChange}
+							margin='normal'
+							required
+							autoComplete='current-password'
+							InputLabelProps={{ required: false }}
+						/>
 
-					<FormControl fullWidth margin='normal'>
-						<InputLabel>Category</InputLabel>
-						<Select name='category' value={formData.category} onChange={handleChange} label='Category'>
-							<MenuItem value='social'>Social Media</MenuItem>
-							<MenuItem value='finance'>Finance</MenuItem>
-							<MenuItem value='work'>Work</MenuItem>
-							<MenuItem value='personal'>Personal</MenuItem>
-						</Select>
-					</FormControl>
-				</Box>
-			</DialogContent>
-			<DialogActions>
-				<Button onClick={onClose}>Cancel</Button>
-				<Button onClick={handleSubmit} variant='contained' color='primary'>
-					Save Changes
-				</Button>
-			</DialogActions>
+						<Box sx={{ mt: 2, mb: 2 }}>
+							<Typography variant='caption'>Password Strength</Typography>
+							<LinearProgress
+								variant='determinate'
+								value={passwordStrength}
+								color={passwordStrength > 75 ? 'success' : passwordStrength > 50 ? 'warning' : 'error'}
+							/>
+						</Box>
+
+						<FormControl fullWidth margin='normal'>
+							<InputLabel>Category</InputLabel>
+							<Select name='category' value={formData.category} onChange={handleChange} label='Category'>
+								<MenuItem value='social'>Social Media</MenuItem>
+								<MenuItem value='finance'>Finance</MenuItem>
+								<MenuItem value='work'>Work</MenuItem>
+								<MenuItem value='personal'>Personal</MenuItem>
+							</Select>
+						</FormControl>
+					</Box>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={onClose}>Cancel</Button>
+					<Button type='submit' variant='contained' color='primary'>
+						Save Changes
+					</Button>
+				</DialogActions>
+			</form>
 		</Dialog>
 	);
 };

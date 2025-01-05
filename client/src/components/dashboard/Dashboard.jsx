@@ -7,12 +7,10 @@ import { PasswordContext } from '../../context/PasswordContext';
 import { calculatePasswordStrength } from '../../utils/passwordStrength';
 
 export default function Dashboard() {
-	const { passwords } = useContext(PasswordContext);
+	const { passwords, decryptedPasswords } = useContext(PasswordContext);
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
 	const stats = useMemo(() => {
-		const decryptedPasswords = {};
-
 		const totalPasswords = passwords.length;
 
 		// Count weak passwords (strength <= 75)
@@ -34,7 +32,7 @@ export default function Dashboard() {
 			weakPasswords,
 			reusedPasswords,
 		};
-	}, [passwords]);
+	}, [passwords, decryptedPasswords]);
 
 	return (
 		<Box>
