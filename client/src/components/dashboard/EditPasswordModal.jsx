@@ -86,11 +86,32 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 	};
 
 	return (
-		<Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
-			<DialogTitle>Edit Password</DialogTitle>
+		<Dialog
+			open={open}
+			onClose={onClose}
+			maxWidth='sm'
+			fullWidth
+			PaperProps={{
+				elevation: 0,
+				sx: {
+					border: '1px solid',
+					borderColor: 'divider',
+				},
+			}}
+		>
+			<DialogTitle
+				sx={{
+					borderBottom: '1px solid',
+					borderColor: 'divider',
+					px: 3,
+					py: 2,
+				}}
+			>
+				Edit Password
+			</DialogTitle>
 			<form onSubmit={handleSubmit}>
-				<DialogContent>
-					<Box sx={{ mt: 2 }}>
+				<DialogContent sx={{ p: 3 }}>
+					<Box>
 						<TextField
 							fullWidth
 							label='Website'
@@ -131,6 +152,7 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 								variant='determinate'
 								value={passwordStrength}
 								color={passwordStrength > 75 ? 'success' : passwordStrength > 50 ? 'warning' : 'error'}
+								sx={{ mt: 1 }}
 							/>
 						</Box>
 
@@ -145,8 +167,16 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 						</FormControl>
 					</Box>
 				</DialogContent>
-				<DialogActions>
-					<Button onClick={onClose}>Cancel</Button>
+				<DialogActions
+					sx={{
+						p: 3,
+						pt: 0,
+						gap: 1,
+					}}
+				>
+					<Button onClick={onClose} variant='text' sx={{ color: 'text.secondary' }}>
+						Cancel
+					</Button>
 					<Button type='submit' variant='contained' color='primary'>
 						Save Changes
 					</Button>

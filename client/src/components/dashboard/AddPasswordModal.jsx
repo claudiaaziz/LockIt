@@ -80,11 +80,32 @@ const AddPasswordModal = ({ open, onClose }) => {
 	};
 
 	return (
-		<Dialog open={open} onClose={handleClose} maxWidth='sm' fullWidth>
-			<DialogTitle>Add New Password</DialogTitle>
+		<Dialog
+			open={open}
+			onClose={handleClose}
+			maxWidth='sm'
+			fullWidth
+			PaperProps={{
+				elevation: 0,
+				sx: {
+					border: '1px solid',
+					borderColor: 'divider',
+				},
+			}}
+		>
+			<DialogTitle
+				sx={{
+					borderBottom: '1px solid',
+					borderColor: 'divider',
+					px: 3,
+					py: 2,
+				}}
+			>
+				Add New Password
+			</DialogTitle>
 			<form onSubmit={handleSubmit}>
-				<DialogContent>
-					<Box sx={{ mt: 2 }}>
+				<DialogContent sx={{ p: 3 }}>
+					<Box>
 						<TextField
 							fullWidth
 							label='Website'
@@ -125,6 +146,7 @@ const AddPasswordModal = ({ open, onClose }) => {
 								variant='determinate'
 								value={passwordStrength}
 								color={passwordStrength > 75 ? 'success' : passwordStrength > 50 ? 'warning' : 'error'}
+								sx={{ mt: 1 }}
 							/>
 						</Box>
 
@@ -139,9 +161,28 @@ const AddPasswordModal = ({ open, onClose }) => {
 						</FormControl>
 					</Box>
 				</DialogContent>
-				<DialogActions>
-					<Button onClick={handleClose}>Cancel</Button>
-					<Button type='submit' variant='contained' color='primary'>
+				<DialogActions
+					sx={{
+						p: 3,
+						pt: 0,
+						gap: 1,
+					}}
+				>
+					<Button onClick={handleClose} variant='text' sx={{ color: 'text.secondary' }}>
+						Cancel
+					</Button>
+					<Button
+						type='submit'
+						sx={{
+							px: 3,
+							backgroundColor: 'primary.main',
+							color: 'background.paper',
+							'&:hover': {
+								backgroundColor: 'primary.dark',
+								boxShadow: '0 0 20px rgba(250, 218, 221, 0.25)',
+							},
+						}}
+					>
 						Save Password
 					</Button>
 				</DialogActions>

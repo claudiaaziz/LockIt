@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo, useContext } from 'react';
-import { Box, Grid, Card, CardContent, Typography, IconButton, InputAdornment, TextField, Chip } from '@mui/material';
-import { Visibility, VisibilityOff, ContentCopy, Edit, Delete, Search } from '@mui/icons-material';
+import { Box, Grid, Typography, InputAdornment, TextField } from '@mui/material';
+import { Search } from '@mui/icons-material';
 import { passwordService } from '../../services/passwordService';
 import EditPasswordModal from './EditPasswordModal';
+import PasswordCard from './PasswordCard';
 import { PasswordContext } from '../../context/PasswordContext';
-import { calculatePasswordStrength, getPasswordStrengthLabel } from '../../utils/passwordStrength';
 
 const PasswordList = () => {
 	const { passwords, setPasswords, decryptedPasswords, setDecryptedPasswords } = useContext(PasswordContext);
@@ -93,13 +93,16 @@ const PasswordList = () => {
 				sx={{
 					mb: 3,
 					'& .MuiOutlinedInput-root': {
-						backgroundColor: 'white',
+						backgroundColor: 'background.paper',
+						'&:hover': {
+							backgroundColor: '#27272A',
+						},
 					},
 				}}
 				InputProps={{
 					startAdornment: (
 						<InputAdornment position='start'>
-							<Search color='action' />
+							<Search sx={{ color: 'text.secondary' }} />
 						</InputAdornment>
 					),
 				}}
@@ -110,113 +113,33 @@ const PasswordList = () => {
 					sx={{
 						textAlign: 'center',
 						py: 4,
-						backgroundColor: 'white',
+						backgroundColor: 'background.paper',
 						borderRadius: 2,
+						border: '1px solid',
+						borderColor: 'divider',
+						minHeight: '400px',
 					}}
 				>
-					<Typography color='textSecondary'>No passwords added yet!</Typography>
+					<Typography color='text.secondary'>Nothing here yet. Add a new password?</Typography>
 				</Box>
 			) : (
 				<Grid container spacing={2}>
 					{filteredPasswords.map((password) => (
 						<Grid item xs={12} md={6} key={password.id}>
-							<Card
-								elevation={0}
-								sx={{
-									borderRadius: 2,
-									transition: 'transform 0.2s ease-in-out',
-									'&:hover': {
-										transform: 'translateY(-2px)',
-									},
-								}}
-							>
-								<CardContent>
-									<Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-										<Typography variant='h6'>{password.website}</Typography>
-										<Chip
-											label={getPasswordStrengthLabel(
-												calculatePasswordStrength(decryptedPasswords[password.id])
-											)}
-											color={
-												calculatePasswordStrength(decryptedPasswords[password.id]) > 75
-													? 'success'
-													: 'error'
-											}
-											size='small'
-											sx={{ textTransform: 'capitalize' }}
-										/>
-									</Box>
-
-									<Typography color='textSecondary' gutterBottom>
-										{password.credential}
-									</Typography>
-
-									<form>
-										<TextField
-											type={showPassword[password.id] ? 'text' : 'password'}
-											value={decryptedPasswords[password.id] || '••••••••'}
-											InputProps={{
-												readOnly: true,
-												endAdornment: (
-													<InputAdornment position='end'>
-														<IconButton
-															size='small'
-															onClick={() => handleTogglePassword(password.id)}
-															sx={{ mr: 0.5 }}
-														>
-															{showPassword[password.id] ? <VisibilityOff /> : <Visibility />}
-														</IconButton>
-														<IconButton
-															size='small'
-															onClick={() => handleCopyPassword(decryptedPasswords[password.id])}
-															sx={{ mr: 0.5 }}
-														>
-															<ContentCopy />
-														</IconButton>
-													</InputAdornment>
-												),
-											}}
-											fullWidth
-											variant='outlined'
-											size='small'
-											autoComplete='off'
-											sx={{
-												'& .MuiOutlinedInput-root': {
-													backgroundColor: 'white',
-												},
-											}}
-										/>
-									</form>
-
-									<Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-										<Typography variant='caption' color='textSecondary'>
-											{password.lastUpdated
-												? `Updated: ${new Date(password.lastUpdated).toLocaleDateString('en-US', {
-														year: 'numeric',
-														month: 'short',
-														day: 'numeric',
-												  })}`
-												: `Created: ${new Date(password.createdAt).toLocaleDateString('en-US', {
-														year: 'numeric',
-														month: 'short',
-														day: 'numeric',
-												  })}`}
-										</Typography>
-										<Box>
-											<IconButton size='small' sx={{ mr: 0.5 }} onClick={() => handleEdit(password)}>
-												<Edit />
-											</IconButton>
-											<IconButton size='small' color='error' onClick={() => handleDelete(password.id)}>
-												<Delete />
-											</IconButton>
-										</Box>
-									</Box>
-								</CardContent>
-							</Card>
+							<PasswordCard
+								password={password}
+								decryptedPassword={decryptedPasswords[password.id]}
+								showPassword={showPassword[password.id]}
+								onTogglePassword={() => handleTogglePassword(password.id)}
+								onCopy={handleCopyPassword}
+								onEdit={handleEdit}
+								onDelete={handleDelete}
+							/>
 						</Grid>
 					))}
 				</Grid>
 			)}
+
 			<EditPasswordModal
 				open={Boolean(editingPassword)}
 				onClose={() => setEditingPassword(null)}

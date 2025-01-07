@@ -6,8 +6,7 @@ const Layout = ({ children }) => {
 			sx={{
 				minHeight: '100vh',
 				bgcolor: 'background.default',
-				p: { xs: 2, sm: 3, md: 4 },
-				width: '100%',
+				p: { xs: 2, sm: 3 },
 			}}
 		>
 			{children}

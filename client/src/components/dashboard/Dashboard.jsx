@@ -1,6 +1,5 @@
 import { useState, useContext, useMemo } from 'react';
 import { Grid, Card, CardContent, Typography, Box, Button, Paper } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
 import PasswordList from './PasswordList';
 import AddPasswordModal from './AddPasswordModal';
 import { PasswordContext } from '../../context/PasswordContext';
@@ -44,20 +43,16 @@ export default function Dashboard() {
 					display: 'flex',
 					justifyContent: 'space-between',
 					alignItems: 'center',
-					bgcolor: 'white',
+					bgcolor: 'background.paper',
 					borderRadius: 2,
+					border: '1px solid',
+					borderColor: 'divider',
 				}}
 			>
 				<Typography variant='h4' component='h1' sx={{ fontWeight: 500 }}>
-					Password Manager
+					Lockit
 				</Typography>
-				<Button
-					variant='contained'
-					startIcon={<AddIcon />}
-					color='primary'
-					onClick={() => setIsAddModalOpen(true)}
-					sx={{ px: 3, py: 1 }}
-				>
+				<Button variant='outlined' color='primary' onClick={() => setIsAddModalOpen(true)} sx={{ px: 3, py: 1 }}>
 					Add Password
 				</Button>
 			</Paper>
