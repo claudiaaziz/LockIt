@@ -1,123 +1,32 @@
-const express = require('express');
-const mysql2 = require('mysql2');
-const cors = require('cors');
-const { encrypt, decrypt } = require('./encryptionAndDecryptionHandler');
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import { config } from './config/index.js';
+import authRoutes from './routes/auth.js';
+import passwordRoutes from './routes/passwords.js';
 
-const PORT = 3001;
-
-// Express app setup
 const app = express();
-app.use(cors());
+
+// Middleware
 app.use(express.json());
+app.use(cookieParser());
+app.use(
+	cors({
+		origin: [config.auth.clientUrl],
+		credentials: true,
+	})
+);
 
-// Database configuration
-const db = mysql2.createConnection({
-	user: 'root',
-	host: 'localhost',
-	password: 'password',
-	database: 'PasswordManager',
+// Routes
+app.use('/auth', authRoutes);
+app.use('/passwords', passwordRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+	console.error(err.stack);
+	res.status(500).json({ message: 'Something broke!' });
 });
 
-/**
- * Password Management API Endpoints
- */
-
-// Create new password
-app.post('/add-password', (req, res) => {
-	const { password, website, credential, category } = req.body;
-	const encryptedPassword = encrypt(password);
-
-	db.query(
-		'INSERT INTO passwords (password, website, iv, credential, category) VALUES (?,?,?,?,?)',
-		[encryptedPassword.password, website, encryptedPassword.iv, credential, category],
-		(err, result) => {
-			if (err) {
-				console.error('Error adding password:', err);
-				res.status(500).json({ error: 'Failed to add password' });
-			} else {
-				res.json({
-					id: result.insertId,
-					website,
-					password,
-					credential,
-					category,
-					iv: encryptedPassword.iv,
-					lastUpdated: new Date().toISOString(),
-				});
-			}
-		}
-	);
+app.listen(config.server.port, () => {
+	console.log(`Server running on port ${config.server.port}`);
 });
-
-// Get all passwords
-app.get('/passwords', (_, res) => {
-	db.query('SELECT * FROM passwords;', (err, result) => {
-		if (err) {
-			console.error('Error fetching passwords:', err);
-			res.status(500).json({ error: 'Failed to fetch passwords' });
-		} else {
-			console.log('Passwords from DB:', result);
-			res.json(result);
-		}
-	});
-});
-
-// Update existing password
-app.put('/update-password/:id', (req, res) => {
-	const { id } = req.params;
-	const { password, website, credential, category } = req.body;
-	const encryptedPassword = encrypt(password);
-
-	db.query(
-		'UPDATE passwords SET password = ?, website = ?, iv = ?, credential = ?, category = ? WHERE id = ?',
-		[encryptedPassword.password, website, encryptedPassword.iv, credential, category, id],
-		(err, result) => {
-			if (err) {
-				console.error('Error updating password:', err);
-				res.status(500).json({ error: 'Failed to update password' });
-			} else if (result.affectedRows === 0) {
-				res.status(404).json({ error: 'Password not found' });
-			} else {
-				res.json({
-					id,
-					website,
-					password,
-					credential,
-					category,
-					iv: encryptedPassword.iv,
-					lastUpdated: new Date().toISOString(),
-				});
-			}
-		}
-	);
-});
-
-// Delete password
-app.delete('/delete-password/:id', (req, res) => {
-	const { id } = req.params;
-
-	db.query('DELETE FROM passwords WHERE id = ?', [id], (err, result) => {
-		if (err) {
-			console.error('Error deleting password:', err);
-			res.status(500).json({ error: 'Failed to delete password' });
-		} else if (result.affectedRows === 0) {
-			res.status(404).json({ error: 'Password not found' });
-		} else {
-			res.json({ message: 'Password deleted successfully' });
-		}
-	});
-});
-
-// Decrypt password
-app.post('/decrypt-password', (req, res) => {
-	try {
-		const decryptedPassword = decrypt(req.body);
-		res.json({ password: decryptedPassword });
-	} catch (err) {
-		console.error('Error decrypting password:', err);
-		res.status(500).json({ error: 'Failed to decrypt password' });
-	}
-});
-
-// Start server
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
