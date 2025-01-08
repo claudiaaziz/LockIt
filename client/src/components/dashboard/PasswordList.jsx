@@ -1,53 +1,25 @@
 import { useState, useEffect, useMemo, useContext } from 'react';
-import { Box, Grid, Typography, InputAdornment, TextField } from '@mui/material';
-import { Search } from '@mui/icons-material';
+import { Box, Grid, Typography, InputAdornment, TextField, Button, Skeleton } from '@mui/material';
+import { Search, LockOpen } from '@mui/icons-material';
 import { passwordService } from '../../services/passwordService';
 import EditPasswordModal from './EditPasswordModal';
 import PasswordCard from './PasswordCard';
 import { PasswordContext } from '../../context/PasswordContext';
+import toast from 'react-hot-toast';
 
-const PasswordList = () => {
-	const { passwords, setPasswords, decryptedPasswords, setDecryptedPasswords } = useContext(PasswordContext);
+const PasswordList = ({ onAddPassword }) => {
+	const { passwords, setPasswords, decryptedPasswords, setDecryptedPasswords, loading } = useContext(PasswordContext);
 
 	const [searchTerm, setSearchTerm] = useState('');
 	const [showPassword, setShowPassword] = useState({});
 	const [editingPassword, setEditingPassword] = useState(null);
-	const [loading, setLoading] = useState(false);
-
-	useEffect(() => {
-		const loadPasswords = async () => {
-			setLoading(true);
-			try {
-				const data = await passwordService.fetchPasswords();
-
-				// Decrypt each password
-				const decrypted = {};
-				for (const pass of data) {
-					try {
-						decrypted[pass.id] = await passwordService.decryptPassword({
-							password: pass.password,
-							iv: pass.iv,
-						});
-					} catch (err) {
-						console.error('Failed to decrypt password:', err);
-					}
-				}
-
-				setDecryptedPasswords(decrypted);
-				setPasswords(data);
-			} catch (error) {
-				console.error('Failed to fetch passwords:', error);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		loadPasswords();
-	}, [setPasswords, setDecryptedPasswords]);
 
 	const handleCopyPassword = (password) => {
 		navigator.clipboard.writeText(password);
-		// TODO: Add toast notification here
+		toast.success('Password copied to clipboard', {
+			duration: 2000,
+			icon: '🔑',
+		});
 	};
 
 	const handleTogglePassword = (id) => {
@@ -82,6 +54,34 @@ const PasswordList = () => {
 		setEditingPassword(password);
 	};
 
+	if (loading) {
+		return (
+			<Box>
+				<Skeleton
+					variant='rectangular'
+					sx={{
+						mb: 3,
+						height: 56,
+						borderRadius: 1,
+					}}
+				/>
+				<Grid container spacing={2}>
+					{[1, 2, 3, 4].map((item) => (
+						<Grid item xs={12} md={6} key={item}>
+							<Skeleton
+								variant='rectangular'
+								sx={{
+									height: 180,
+									borderRadius: 2,
+								}}
+							/>
+						</Grid>
+					))}
+				</Grid>
+			</Box>
+		);
+	}
+
 	return (
 		<Box>
 			<TextField
@@ -112,15 +112,29 @@ const PasswordList = () => {
 				<Box
 					sx={{
 						textAlign: 'center',
-						py: 4,
+						py: 8,
 						backgroundColor: 'background.paper',
 						borderRadius: 2,
 						border: '1px solid',
 						borderColor: 'divider',
 						minHeight: '400px',
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'center',
+						justifyContent: 'center',
+						gap: 2,
 					}}
 				>
-					<Typography color='text.secondary'>Nothing here yet. Add a new password?</Typography>
+					<LockOpen sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+					<Typography color='text.secondary' variant='h6' sx={{ mb: 1 }}>
+						No passwords yet
+					</Typography>
+					<Typography color='text.secondary' variant='body2' sx={{ mb: 3 }}>
+						Add your first password to get started
+					</Typography>
+					<Button variant='contained' onClick={onAddPassword} sx={{ px: 4 }}>
+						Add Password
+					</Button>
 				</Box>
 			) : (
 				<Grid container spacing={2}>

@@ -49,6 +49,24 @@ export const theme = createTheme({
 					textTransform: 'none',
 					borderRadius: 8,
 					fontWeight: 500,
+					transition: 'all 0.2s ease-in-out',
+				},
+				contained: {
+					backgroundColor: 'primary.main',
+					color: 'background.paper',
+					'&:hover': {
+						backgroundColor: 'primary.dark',
+						boxShadow: '0 0 20px rgba(250, 218, 221, 0.25)',
+						transform: 'translateY(-1px)',
+					},
+				},
+				outlined: {
+					borderColor: 'primary.main',
+					color: 'primary.main',
+					'&:hover': {
+						backgroundColor: 'rgba(250, 218, 221, 0.1)',
+						borderColor: 'primary.light',
+					},
 				},
 			},
 		},
@@ -60,16 +78,16 @@ export const theme = createTheme({
 						backgroundColor: '#27272A',
 					},
 					'& input:-webkit-autofill': {
-						'-webkit-box-shadow': '0 0 0 100px #18181B inset',
-						'-webkit-text-fill-color': '#FAFAFA',
-						'caret-color': '#FAFAFA',
-						'border-radius': 'inherit',
+						WebkitBoxShadow: '0 0 0 100px #18181B inset',
+						WebkitTextFillColor: '#FAFAFA',
+						caretColor: '#FAFAFA',
+						borderRadius: 'inherit',
 					},
 					'& input:-webkit-autofill:hover': {
-						'-webkit-box-shadow': '0 0 0 100px #27272A inset',
+						WebkitBoxShadow: '0 0 0 100px #27272A inset',
 					},
 					'& input:-webkit-autofill:focus': {
-						'-webkit-box-shadow': '0 0 0 100px #27272A inset',
+						WebkitBoxShadow: '0 0 0 100px #27272A inset',
 					},
 				},
 			},

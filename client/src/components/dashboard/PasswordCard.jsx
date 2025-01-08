@@ -1,8 +1,10 @@
 import { Card, CardContent, Typography, Box, IconButton, InputAdornment, TextField, Chip, Divider } from '@mui/material';
-import { Visibility, VisibilityOff, ContentCopy, Edit, Delete, Link } from '@mui/icons-material';
+import { Visibility, VisibilityOff, ContentCopy, Edit, Delete } from '@mui/icons-material';
 import { calculatePasswordStrength, getPasswordStrengthLabel } from '../../utils/passwordStrength';
 
 const PasswordCard = ({ password, decryptedPassword, showPassword, onTogglePassword, onCopy, onEdit, onDelete }) => {
+	const handleCopy = () => onCopy(decryptedPassword);
+
 	return (
 		<Card
 			elevation={0}
@@ -63,13 +65,17 @@ const PasswordCard = ({ password, decryptedPassword, showPassword, onTogglePassw
 									</IconButton>
 									<IconButton
 										size='small'
-										onClick={() => onCopy(decryptedPassword)}
+										onClick={handleCopy}
 										sx={{
 											mr: 0.5,
-											'&:hover': { color: 'primary.main' },
+											'&:hover': {
+												color: 'primary.main',
+												transform: 'scale(1.1)',
+											},
+											transition: 'all 0.2s ease-in-out',
 										}}
 									>
-										<ContentCopy />
+										<ContentCopy fontSize='small' />
 									</IconButton>
 								</InputAdornment>
 							),
