@@ -9,6 +9,19 @@ const router = express.Router();
 // Database connection
 const db = mysql2.createConnection(config.db);
 
+// Get all passwords
+router.get('/', auth, (req, res) => {
+	console.log('Hit Get Passwords');
+	db.query('SELECT * FROM passwords;', (err, result) => {
+		if (err) {
+			console.error('Error fetching passwords:', err);
+			res.status(500).json({ error: 'Failed to fetch passwords' });
+		} else {
+			res.json(result);
+		}
+	});
+});
+
 // Create new password
 router.post('/', auth, (req, res) => {
 	const { password, website, credential, category } = req.body;
@@ -34,18 +47,6 @@ router.post('/', auth, (req, res) => {
 			}
 		}
 	);
-});
-
-// Get all passwords
-router.get('/', auth, (req, res) => {
-	db.query('SELECT * FROM passwords;', (err, result) => {
-		if (err) {
-			console.error('Error fetching passwords:', err);
-			res.status(500).json({ error: 'Failed to fetch passwords' });
-		} else {
-			res.json(result);
-		}
-	});
 });
 
 // Update existing password

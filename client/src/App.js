@@ -2,66 +2,29 @@ import { useContext, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate, createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { createContext, useCallback } from 'react';
+import { AuthContext, AuthContextProvider } from './context/AuthContext';
 
 axios.defaults.withCredentials = true;
 const serverUrl = process.env.REACT_APP_SERVER_URL;
 
-const AuthContext = createContext();
-
-const AuthContextProvider = ({ children }) => {
-	const [loggedIn, setLoggedIn] = useState(null);
-	const [user, setUser] = useState(null);
-
-	const checkLoginState = useCallback(async () => {
-		try {
-			const {
-				data: { loggedIn: logged_in, user },
-			} = await axios.get(`${serverUrl}/auth/logged_in`);
-			console.log('logged_in: ', logged_in);
-			setLoggedIn(logged_in);
-			user && setUser(user);
-		} catch (err) {
-			console.error(err);
-		}
-	}, []);
-
-	useEffect(() => {
-		checkLoginState();
-	}, [checkLoginState]);
-
-	return <AuthContext.Provider value={{ loggedIn, checkLoginState, user }}>{children}</AuthContext.Provider>;
-};
-
 const Dashboard = () => {
-	console.log('Hit Dashboard');
 	const { user, loggedIn, checkLoginState } = useContext(AuthContext);
-	const [posts, setPosts] = useState([]);
+	// const [posts, setPosts] = useState([]);
 	useEffect(() => {
 		(async () => {
 			if (loggedIn === true) {
 				try {
-					// Get posts from server
-					const {
-						data: { posts },
-					} = await axios.get(`${serverUrl}/user/posts`);
-					setPosts(posts);
+					// Get passwords of user from server
+					// const {
+					// 	data: { posts },
+					// } = await axios.get(`${serverUrl}/user/posts`);
+					// setPosts(posts);
 				} catch (err) {
 					console.error(err);
 				}
 			}
 		})();
 	}, [loggedIn]);
-
-	const handleLogout = async () => {
-		try {
-			await axios.post(`${serverUrl}/auth/logout`);
-			// Check login state again
-			checkLoginState();
-		} catch (err) {
-			console.error(err);
-		}
-	};
 
 	return (
 		<>
@@ -85,6 +48,16 @@ const Dashboard = () => {
 			</div>
 		</>
 	);
+};
+
+const handleLogout = async () => {
+	try {
+		await axios.post(`${serverUrl}/auth/logout`);
+		// Check login state again
+		checkLoginState();
+	} catch (err) {
+		console.error(err);
+	}
 };
 
 const Login = () => {
@@ -154,49 +127,40 @@ const router = createBrowserRouter([
 	},
 ]);
 
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import { Toaster } from 'react-hot-toast';
+import Layout from './components/layout/Layout';
+import { PasswordProvider } from './context/PasswordContext';
+import { theme } from './theme';
+import Dashboard from './components/dashboard/Dashboard';
 export default function App() {
 	return (
-		<div className='App'>
-			<header className='App-header'>
-				<h1>Hello World</h1>
-				<AuthContextProvider>
-					<RouterProvider router={router} />
-				</AuthContextProvider>
-			</header>
-		</div>
+		<AuthContextProvider>
+			<RouterProvider router={router} />
+			<ThemeProvider theme={theme}>
+				<CssBaseline />
+				<Toaster
+					position='bottom-right'
+					toastOptions={{
+						style: {
+							background: '#27272A',
+							color: '#FAFAFA',
+							border: '1px solid rgba(250, 218, 221, 0.1)',
+						},
+						success: {
+							iconTheme: {
+								primary: '#FADADD',
+								secondary: '#27272A',
+							},
+						},
+					}}
+				/>
+				<PasswordProvider>
+					<Layout>
+						<Dashboard />
+					</Layout>
+				</PasswordProvider>
+			</ThemeProvider>
+		</AuthContextProvider>
 	);
 }
-
-// import { ThemeProvider, CssBaseline } from '@mui/material';
-// import { Toaster } from 'react-hot-toast';
-// import Layout from './components/layout/Layout';
-// import { PasswordProvider } from './context/PasswordContext';
-// import { theme } from './theme';
-// export default function App() {
-// 	return (
-// 		<ThemeProvider theme={theme}>
-// 			<CssBaseline />
-// 			<Toaster
-// 				position='bottom-right'
-// 				toastOptions={{
-// 					style: {
-// 						background: '#27272A',
-// 						color: '#FAFAFA',
-// 						border: '1px solid rgba(250, 218, 221, 0.1)',
-// 					},
-// 					success: {
-// 						iconTheme: {
-// 							primary: '#FADADD',
-// 							secondary: '#27272A',
-// 						},
-// 					},
-// 				}}
-// 			/>
-// 			<PasswordProvider>
-// 				<Layout>
-// 					<Dashboard />
-// 				</Layout>
-// 			</PasswordProvider>
-// 		</ThemeProvider>
-// 	);
-// }
