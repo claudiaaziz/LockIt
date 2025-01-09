@@ -1,6 +1,6 @@
 import express from 'express';
 import mysql2 from 'mysql2';
-import { encrypt, decrypt } from '../utils/encryption.js';
+import { encrypt, decrypt } from '../utils/encryptionAndDecryptionHandler.js';
 import { auth } from '../middleware/auth.js';
 import { config } from '../config/index.js';
 

@@ -31,7 +31,8 @@ router.get('/url', (_, res) => {
 	});
 });
 
-app.get('/auth/token', async (req, res) => {
+// This is the endpoint that google will redirect to after the user has authenticated
+router.get('/token', async (req, res) => {
 	const { code } = req.query;
 	if (!code) return res.status(400).json({ message: 'Authorization code must be provided' });
 	try {
@@ -40,18 +41,18 @@ app.get('/auth/token', async (req, res) => {
 		// Exchange authorization code for access token (id token is returned here too)
 		const {
 			data: { id_token },
-		} = await axios.post(`${config.tokenUrl}?${tokenParam}`);
+		} = await axios.post(`${config.auth.tokenUrl}?${tokenParam}`);
 		if (!id_token) return res.status(400).json({ message: 'Auth error' });
 		// Get user info from id token
 		const { email, name, picture } = jwt.decode(id_token);
 		const user = { name, email, picture };
 		// Sign a new token
-		const token = jwt.sign({ user }, config.tokenSecret, {
-			expiresIn: config.tokenExpiration,
+		const token = jwt.sign({ user }, config.auth.tokenSecret, {
+			expiresIn: config.auth.tokenExpiration,
 		});
 		// Set cookies for user
 		res.cookie('token', token, {
-			maxAge: config.tokenExpiration,
+			maxAge: config.auth.tokenExpiration,
 			httpOnly: true,
 		});
 		// You can choose to store user in a DB instead
@@ -64,18 +65,18 @@ app.get('/auth/token', async (req, res) => {
 	}
 });
 
-app.get('/auth/logged_in', (req, res) => {
+router.get('/logged_in', (req, res) => {
 	try {
 		// Get token from cookie
 		const token = req.cookies.token;
 		if (!token) return res.json({ loggedIn: false });
-		const { user } = jwt.verify(token, config.tokenSecret);
-		const newToken = jwt.sign({ user }, config.tokenSecret, {
-			expiresIn: config.tokenExpiration,
+		const { user } = jwt.verify(token, config.auth.tokenSecret);
+		const newToken = jwt.sign({ user }, config.auth.tokenSecret, {
+			expiresIn: config.auth.tokenExpiration,
 		});
 		// Reset token in cookie
 		res.cookie('token', newToken, {
-			maxAge: config.tokenExpiration,
+			maxAge: config.auth.tokenExpiration,
 			httpOnly: true,
 		});
 		res.json({ loggedIn: true, user });
@@ -84,7 +85,7 @@ app.get('/auth/logged_in', (req, res) => {
 	}
 });
 
-app.post('/auth/logout', (_, res) => {
+router.post('/logout', (_, res) => {
 	res.clearCookie('token').json({ message: 'Logged out' });
 });
 

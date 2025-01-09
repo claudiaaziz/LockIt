@@ -4,6 +4,8 @@ import cookieParser from 'cookie-parser';
 import { config } from './config/index.js';
 import authRoutes from './routes/auth.js';
 import passwordRoutes from './routes/passwords.js';
+import { auth } from './middleware/auth.js';
+import axios from 'axios';
 
 const app = express();
 
@@ -29,4 +31,14 @@ app.use((err, req, res, next) => {
 
 app.listen(config.server.port, () => {
 	console.log(`Server running on port ${config.server.port}`);
+});
+
+// temp while testing
+app.get('/user/posts', auth, async (_, res) => {
+	try {
+		const { data } = await axios.get(config.auth.postUrl);
+		res.json({ posts: data?.slice(0, 5) });
+	} catch (err) {
+		console.error('Error: ', err);
+	}
 });

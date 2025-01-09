@@ -17,8 +17,9 @@ export const config = {
 		clientUrl: process.env.CLIENT_URL,
 		tokenSecret: process.env.TOKEN_SECRET,
 		tokenExpiration: 36000,
+		postUrl: 'https://jsonplaceholder.typicode.com/posts',
 	},
 	server: {
-		port: 3001,
+		port: 5001,
 	},
 };
