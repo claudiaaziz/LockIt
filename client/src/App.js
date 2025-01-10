@@ -1,142 +1,45 @@
-import { useContext, useRef } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import { Toaster } from 'react-hot-toast';
 import axios from 'axios';
-import { useNavigate, createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { AuthContext, AuthContextProvider } from './context/AuthContext';
 
+import { AuthContextProvider } from './context/AuthContext';
+import { PasswordProvider } from './context/PasswordContext';
+import { theme } from './theme';
+
+import Layout from './components/layout/Layout';
+import Dashboard from './components/dashboard/Dashboard';
+import Callback from './components/auth/Callback';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import Login from './components/auth/Login';
+
+// Configure axios defaults
 axios.defaults.withCredentials = true;
-const serverUrl = process.env.REACT_APP_SERVER_URL;
-
-const Dashboard = () => {
-	const { user, loggedIn, checkLoginState } = useContext(AuthContext);
-	// const [posts, setPosts] = useState([]);
-	useEffect(() => {
-		(async () => {
-			if (loggedIn === true) {
-				try {
-					// Get passwords of user from server
-					// const {
-					// 	data: { posts },
-					// } = await axios.get(`${serverUrl}/user/posts`);
-					// setPosts(posts);
-				} catch (err) {
-					console.error(err);
-				}
-			}
-		})();
-	}, [loggedIn]);
-
-	return (
-		<>
-			<h3>Dashboard</h3>
-			<button className='btn' onClick={handleLogout}>
-				Logout
-			</button>
-			<h4>{user?.name}</h4>
-			<br />
-			<p>{user?.email}</p>
-			<br />
-			<img src={user?.picture} alt={user?.name} />
-			<br />
-			<div>
-				{posts.map((post, idx) => (
-					<div>
-						<h5>{post?.title}</h5>
-						<p>{post?.body}</p>
-					</div>
-				))}
-			</div>
-		</>
-	);
-};
-
-const handleLogout = async () => {
-	try {
-		await axios.post(`${serverUrl}/auth/logout`);
-		// Check login state again
-		checkLoginState();
-	} catch (err) {
-		console.error(err);
-	}
-};
-
-const Login = () => {
-	const handleLogin = async () => {
-		try {
-			// Gets authentication url from backend server
-			const {
-				data: { url },
-			} = await axios.get(`${serverUrl}/auth/url`);
-			// Navigate to consent screen
-			window.location.assign(url);
-		} catch (err) {
-			console.error(err);
-		}
-	};
-	return (
-		<>
-			<h3>Login to Dashboard</h3>
-			<button className='btn' onClick={handleLogin}>
-				Login
-			</button>
-		</>
-	);
-};
-
-const Callback = () => {
-	const called = useRef(false);
-	const { checkLoginState, loggedIn } = useContext(AuthContext);
-	const navigate = useNavigate();
-	useEffect(() => {
-		(async () => {
-			if (loggedIn === false) {
-				try {
-					if (called.current) return; // prevent rerender caused by StrictMode
-					called.current = true;
-					const res = await axios.get(`${serverUrl}/auth/token${window.location.search}`);
-					console.log('response from callback: ', res);
-					checkLoginState();
-					navigate('/');
-				} catch (err) {
-					console.error(err);
-					navigate('/');
-				}
-			} else if (loggedIn === true) {
-				navigate('/');
-			}
-		})();
-	}, [checkLoginState, loggedIn, navigate]);
-	return <></>;
-};
-
-const Home = () => {
-	const { loggedIn } = useContext(AuthContext);
-	if (loggedIn === true) return <Dashboard />;
-	if (loggedIn === false) return <Login />;
-	return <></>;
-};
 
 const router = createBrowserRouter([
 	{
 		path: '/',
-		element: <Home />,
+		element: (
+			<ProtectedRoute>
+				<Layout>
+					<Dashboard />
+				</Layout>
+			</ProtectedRoute>
+		),
 	},
 	{
-		path: '/auth/callback', // google will redirect here
+		path: '/login',
+		element: <Login />,
+	},
+	{
+		path: '/auth/callback',
 		element: <Callback />,
 	},
 ]);
 
-import { ThemeProvider, CssBaseline } from '@mui/material';
-import { Toaster } from 'react-hot-toast';
-import Layout from './components/layout/Layout';
-import { PasswordProvider } from './context/PasswordContext';
-import { theme } from './theme';
-import Dashboard from './components/dashboard/Dashboard';
 export default function App() {
 	return (
 		<AuthContextProvider>
-			<RouterProvider router={router} />
 			<ThemeProvider theme={theme}>
 				<CssBaseline />
 				<Toaster
@@ -156,9 +59,7 @@ export default function App() {
 					}}
 				/>
 				<PasswordProvider>
-					<Layout>
-						<Dashboard />
-					</Layout>
+					<RouterProvider router={router} />
 				</PasswordProvider>
 			</ThemeProvider>
 		</AuthContextProvider>
