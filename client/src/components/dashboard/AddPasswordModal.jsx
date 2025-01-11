@@ -3,7 +3,6 @@ import {
 	DialogTitle,
 	DialogContent,
 	DialogActions,
-	Button,
 	TextField,
 	Box,
 	FormControl,
@@ -16,6 +15,7 @@ import {
 import { useContext, useState } from 'react';
 import { passwordService } from '../../services/passwordService';
 import { PasswordContext } from '../../context/PasswordContext';
+import Button from '../common/Button';
 
 const AddPasswordModal = ({ open, onClose }) => {
 	const { passwords, setPasswords, decryptedPasswords, setDecryptedPasswords } = useContext(PasswordContext);
@@ -168,23 +168,10 @@ const AddPasswordModal = ({ open, onClose }) => {
 						gap: 1,
 					}}
 				>
-					<Button onClick={handleClose} variant='text' sx={{ color: 'text.secondary' }}>
+					<Button variant='secondary' onClick={handleClose}>
 						Cancel
 					</Button>
-					<Button
-						type='submit'
-						sx={{
-							px: 3,
-							backgroundColor: 'primary.main',
-							color: 'background.paper',
-							'&:hover': {
-								backgroundColor: 'primary.dark',
-								boxShadow: '0 0 20px rgba(250, 218, 221, 0.25)',
-							},
-						}}
-					>
-						Save Password
-					</Button>
+					<Button type='submit'>Save Password</Button>
 				</DialogActions>
 			</form>
 		</Dialog>

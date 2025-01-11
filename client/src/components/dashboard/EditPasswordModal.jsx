@@ -3,7 +3,6 @@ import {
 	DialogTitle,
 	DialogContent,
 	DialogActions,
-	Button,
 	TextField,
 	Box,
 	FormControl,
@@ -16,6 +15,8 @@ import {
 import { useState, useEffect, useContext } from 'react';
 import { passwordService } from '../../services/passwordService';
 import { PasswordContext } from '../../context/PasswordContext';
+import Button from '../common/Button';
+
 const EditPasswordModal = ({ open, onClose, passwordData }) => {
 	const { passwords, setPasswords, decryptedPasswords, setDecryptedPasswords } = useContext(PasswordContext);
 
@@ -174,12 +175,10 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 						gap: 1,
 					}}
 				>
-					<Button onClick={onClose} variant='text' sx={{ color: 'text.secondary' }}>
+					<Button variant='secondary' onClick={onClose}>
 						Cancel
 					</Button>
-					<Button type='submit' variant='contained' color='primary'>
-						Save Changes
-					</Button>
+					<Button type='submit'>Save Changes</Button>
 				</DialogActions>
 			</form>
 		</Dialog>

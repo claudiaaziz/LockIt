@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import axios from 'axios';
 import queryString from 'query-string';
 import { config } from '../config/index.js';
+import { UserModel } from '../models/User.js';
 
 const router = express.Router();
 
@@ -45,20 +46,22 @@ router.get('/token', async (req, res) => {
 		if (!id_token) return res.status(400).json({ message: 'Auth error' });
 		// Get user info from id token
 		const { email, name, picture } = jwt.decode(id_token);
-		const user = { name, email, picture };
-		// Sign a new token
-		const token = jwt.sign({ user }, config.auth.tokenSecret, {
-			expiresIn: config.auth.tokenExpiration,
+		// Create or update user in database
+		const user = await UserModel.findOrCreate({
+			google_id: email, // Using email as google_id for now
+			email,
+			name,
+			picture,
 		});
+		// Sign token with full user info
+		const token = jwt.sign({ user }, config.auth.tokenSecret, { expiresIn: config.auth.tokenExpiration });
 		// Set cookies for user
 		res.cookie('token', token, {
 			maxAge: config.auth.tokenExpiration,
 			httpOnly: true,
 		});
 		// You can choose to store user in a DB instead
-		res.json({
-			user,
-		});
+		res.json({ user });
 	} catch (err) {
 		console.error('Error: ', err);
 		res.status(500).json({ message: err.message || 'Server error' });
@@ -67,18 +70,19 @@ router.get('/token', async (req, res) => {
 
 router.get('/logged_in', (req, res) => {
 	try {
-		// Get token from cookie
 		const token = req.cookies.token;
 		if (!token) return res.json({ loggedIn: false });
+
 		const { user } = jwt.verify(token, config.auth.tokenSecret);
-		const newToken = jwt.sign({ user }, config.auth.tokenSecret, {
-			expiresIn: config.auth.tokenExpiration,
-		});
-		// Reset token in cookie
+		console.log('Server  - User data being sent from logged_in:', user);
+
+		const newToken = jwt.sign({ user }, config.auth.tokenSecret, { expiresIn: config.auth.tokenExpiration });
+
 		res.cookie('token', newToken, {
 			maxAge: config.auth.tokenExpiration,
 			httpOnly: true,
 		});
+
 		res.json({ loggedIn: true, user });
 	} catch (err) {
 		res.json({ loggedIn: false });

@@ -1,14 +1,34 @@
 import { useState, useContext, useMemo, useEffect } from 'react';
-import { Grid, Card, CardContent, Typography, Box, Button, Paper, Skeleton } from '@mui/material';
+import { Grid, Card, CardContent, Typography, Box, Paper, Skeleton, Avatar, Menu, MenuItem, IconButton } from '@mui/material';
 import PasswordList from './PasswordList';
 import AddPasswordModal from './AddPasswordModal';
 import { PasswordContext } from '../../context/PasswordContext';
 import { calculatePasswordStrength } from '../../utils/passwordStrength';
 import { Key, Warning, ContentCopy } from '@mui/icons-material';
+import { AuthContext } from '../../context/AuthContext';
+import Button from '../common/Button';
 
 export default function Dashboard() {
 	const { passwords, decryptedPasswords, loading, loadPasswords } = useContext(PasswordContext);
+	const { user, logout } = useContext(AuthContext);
+	console.log('Dashboard 🩷 user:', user);
+	console.log('Full user object:', user);
+	console.log('Picture URL:', user?.picture);
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+	const [anchorEl, setAnchorEl] = useState(null);
+
+	const handleMenuOpen = (event) => {
+		setAnchorEl(event.currentTarget);
+	};
+
+	const handleMenuClose = () => {
+		setAnchorEl(null);
+	};
+
+	const handleLogout = () => {
+		handleMenuClose();
+		logout();
+	};
 
 	useEffect(() => {
 		loadPasswords();
@@ -57,9 +77,50 @@ export default function Dashboard() {
 				<Typography variant='h4' component='h1' sx={{ fontWeight: 500 }}>
 					Lockit
 				</Typography>
-				<Button variant='outlined' color='primary' onClick={() => setIsAddModalOpen(true)} sx={{ px: 3, py: 1 }}>
-					Add Password
-				</Button>
+
+				<Button onClick={() => setIsAddModalOpen(true)}>Add Password</Button>
+
+				<Box sx={{ display: 'flex', alignItems: 'center' }}>
+					{user?.picture && (
+						<>
+							<IconButton onClick={handleMenuOpen}>
+								<Avatar
+									src={user.picture}
+									alt={user.name}
+									sx={{
+										width: 35,
+										height: 35,
+									}}
+								/>
+							</IconButton>
+							<Menu
+								anchorEl={anchorEl}
+								open={Boolean(anchorEl)}
+								onClose={handleMenuClose}
+								anchorOrigin={{
+									vertical: 'bottom',
+									horizontal: 'right',
+								}}
+								transformOrigin={{
+									vertical: 'top',
+									horizontal: 'right',
+								}}
+								sx={{ cursor: 'default' }}
+							>
+								<MenuItem sx={{ minWidth: 150, cursor: 'default' }}>
+									<Typography variant='body2' color='text.secondary'>
+										{user.name}
+									</Typography>
+								</MenuItem>
+								<MenuItem onClick={handleLogout} sx={{ minWidth: 150 }}>
+									<Typography variant='body2' color='text.secondary'>
+										Logout
+									</Typography>
+								</MenuItem>
+							</Menu>
+						</>
+					)}
+				</Box>
 			</Paper>
 
 			<Grid container spacing={3} sx={{ mb: 4 }}>
