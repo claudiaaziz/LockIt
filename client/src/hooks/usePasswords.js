@@ -47,6 +47,7 @@ export const usePasswords = () => {
 	 * @returns {Promise<void>}
 	 */
 	const loadPasswords = async () => {
+		console.log('Loading passwords...');
 		try {
 			const data = await passwordService.fetchPasswords();
 			const decrypted = {};

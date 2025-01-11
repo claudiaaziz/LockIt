@@ -16,16 +16,14 @@ import { useState, useEffect, useContext } from 'react';
 import { passwordService } from '../../services/passwordService';
 import { PasswordContext } from '../../context/PasswordContext';
 import Button from '../common/Button';
+import { toast } from 'react-hot-toast';
+import { validatePasswordForm } from '../../utils/validation';
+import { passwordCategories, initialPasswordFormState } from '../../config/formConfig';
 
 const EditPasswordModal = ({ open, onClose, passwordData }) => {
 	const { passwords, setPasswords, decryptedPasswords, setDecryptedPasswords } = useContext(PasswordContext);
 
-	const [formData, setFormData] = useState({
-		website: '',
-		credential: '',
-		password: '',
-		category: '',
-	});
+	const [formData, setFormData] = useState(initialPasswordFormState);
 
 	const [passwordStrength, setPasswordStrength] = useState(0);
 
@@ -64,6 +62,8 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		if (!validatePasswordForm(formData, passwordStrength)) return;
+
 		try {
 			const updatedPassword = await passwordService.updatePassword(passwordData.id, {
 				...formData,
@@ -80,8 +80,19 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 				[passwordData.id]: formData.password,
 			});
 
+			toast.success('Password updated successfully');
 			onClose();
 		} catch (error) {
+			// Handle specific errors
+			if (error.response?.status === 429) {
+				toast.error('Please wait before making more changes');
+			} else if (error.response?.status === 400) {
+				toast.error(error.message || 'Please check your input');
+			} else if (error.response?.status === 403) {
+				toast.error('Session expired. Please refresh the page');
+			} else {
+				toast.error('Failed to update password');
+			}
 			console.error('Failed to update password:', error);
 		}
 	};
@@ -120,7 +131,6 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 							value={formData.website}
 							onChange={handleChange}
 							margin='normal'
-							required
 							InputLabelProps={{ required: false }}
 						/>
 						<TextField
@@ -130,7 +140,6 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 							value={formData.credential}
 							onChange={handleChange}
 							margin='normal'
-							required
 							autoComplete='username'
 							InputLabelProps={{ required: false }}
 						/>
@@ -138,11 +147,10 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 							fullWidth
 							label='Password'
 							name='password'
-							type='password'
+							type='text'
 							value={formData.password}
 							onChange={handleChange}
 							margin='normal'
-							required
 							autoComplete='current-password'
 							InputLabelProps={{ required: false }}
 						/>
@@ -160,10 +168,11 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 						<FormControl fullWidth margin='normal'>
 							<InputLabel>Category</InputLabel>
 							<Select name='category' value={formData.category} onChange={handleChange} label='Category'>
-								<MenuItem value='social'>Social Media</MenuItem>
-								<MenuItem value='finance'>Finance</MenuItem>
-								<MenuItem value='work'>Work</MenuItem>
-								<MenuItem value='personal'>Personal</MenuItem>
+								{passwordCategories.map(({ value, label }) => (
+									<MenuItem key={value} value={value}>
+										{label}
+									</MenuItem>
+								))}
 							</Select>
 						</FormControl>
 					</Box>

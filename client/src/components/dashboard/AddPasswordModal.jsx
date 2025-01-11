@@ -16,16 +16,14 @@ import { useContext, useState } from 'react';
 import { passwordService } from '../../services/passwordService';
 import { PasswordContext } from '../../context/PasswordContext';
 import Button from '../common/Button';
+import { toast } from 'react-hot-toast';
+import { validatePasswordForm } from '../../utils/validation';
+import { passwordCategories, initialPasswordFormState } from '../../config/formConfig';
 
 const AddPasswordModal = ({ open, onClose }) => {
 	const { passwords, setPasswords, decryptedPasswords, setDecryptedPasswords } = useContext(PasswordContext);
 
-	const [formData, setFormData] = useState({
-		website: '',
-		credential: '',
-		password: '',
-		category: '',
-	});
+	const [formData, setFormData] = useState(initialPasswordFormState);
 	const [passwordStrength, setPasswordStrength] = useState(0);
 
 	const handleChange = (e) => {
@@ -47,6 +45,8 @@ const AddPasswordModal = ({ open, onClose }) => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		if (!validatePasswordForm(formData, passwordStrength)) return;
+
 		try {
 			const newPassword = await passwordService.addPassword({
 				...formData,
@@ -56,25 +56,23 @@ const AddPasswordModal = ({ open, onClose }) => {
 				...decryptedPasswords,
 				[newPassword.id]: formData.password,
 			});
+			toast.success('Password added successfully');
 			onClose();
-			setFormData({
-				website: '',
-				credential: '',
-				password: '',
-				category: '',
-			});
+			setFormData(initialPasswordFormState);
 		} catch (error) {
+			if (error.response?.status === 429) {
+				toast.error('Please wait before adding more passwords');
+			} else if (error.response?.status === 400) {
+				toast.error(error.message || 'Please check your input');
+			} else {
+				toast.error('Failed to add password');
+			}
 			console.error('Failed to add password:', error);
 		}
 	};
 
 	const handleClose = () => {
-		setFormData({
-			website: '',
-			credential: '',
-			password: '',
-			category: '',
-		});
+		setFormData(initialPasswordFormState);
 		setPasswordStrength(0);
 		onClose();
 	};
@@ -113,7 +111,6 @@ const AddPasswordModal = ({ open, onClose }) => {
 							value={formData.website}
 							onChange={handleChange}
 							margin='normal'
-							required
 							InputLabelProps={{ required: false }}
 						/>
 						<TextField
@@ -131,7 +128,7 @@ const AddPasswordModal = ({ open, onClose }) => {
 							fullWidth
 							label='Password'
 							name='password'
-							type='password'
+							type='text'
 							value={formData.password}
 							onChange={handleChange}
 							margin='normal'
@@ -153,10 +150,11 @@ const AddPasswordModal = ({ open, onClose }) => {
 						<FormControl fullWidth margin='normal'>
 							<InputLabel>Category</InputLabel>
 							<Select name='category' value={formData.category} onChange={handleChange} label='Category'>
-								<MenuItem value='social'>Social Media</MenuItem>
-								<MenuItem value='finance'>Finance</MenuItem>
-								<MenuItem value='work'>Work</MenuItem>
-								<MenuItem value='personal'>Personal</MenuItem>
+								{passwordCategories.map(({ value, label }) => (
+									<MenuItem key={value} value={value}>
+										{label}
+									</MenuItem>
+								))}
 							</Select>
 						</FormControl>
 					</Box>

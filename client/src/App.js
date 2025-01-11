@@ -10,6 +10,8 @@ import Dashboard from './components/dashboard/Dashboard';
 import Callback from './components/auth/Callback';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Login from './components/auth/Login';
+import { useEffect } from 'react';
+import { setupCSRF } from './services/api';
 
 axios.defaults.withCredentials = true;
 
@@ -35,6 +37,10 @@ const router = createBrowserRouter([
 ]);
 
 export default function App() {
+	useEffect(() => {
+		setupCSRF();
+	}, []);
+
 	return (
 		<AuthContextProvider>
 			<ThemeProvider theme={theme}>

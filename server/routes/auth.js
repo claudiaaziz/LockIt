@@ -74,7 +74,6 @@ router.get('/logged_in', (req, res) => {
 		if (!token) return res.json({ loggedIn: false });
 
 		const { user } = jwt.verify(token, config.auth.tokenSecret);
-		console.log('Server  - User data being sent from logged_in:', user);
 
 		const newToken = jwt.sign({ user }, config.auth.tokenSecret, { expiresIn: config.auth.tokenExpiration });
 
