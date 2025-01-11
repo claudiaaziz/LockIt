@@ -1,29 +1,35 @@
-import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:3001';
+import { api } from './api';
 
 export const passwordService = {
 	fetchPasswords: async () => {
-		const response = await axios.get(`${API_BASE_URL}/passwords`);
-		return response.data;
+		try {
+			const response = await api.get('/passwords');
+			return response.data;
+		} catch (error) {
+			// Handle specific errors
+			if (error.response?.status === 429) {
+				throw new Error('Please wait before requesting more passwords');
+			}
+			throw error;
+		}
 	},
 
 	addPassword: async (passwordData) => {
-		const response = await axios.post(`${API_BASE_URL}/add-password`, passwordData);
+		const response = await api.post('/passwords', passwordData);
 		return response.data;
 	},
 
 	updatePassword: async (id, data) => {
-		const response = await axios.put(`${API_BASE_URL}/update-password/${id}`, data);
+		const response = await api.put(`/passwords/${id}`, data);
 		return response.data;
 	},
 
 	deletePassword: async (id) => {
-		await axios.delete(`${API_BASE_URL}/delete-password/${id}`);
+		await api.delete(`/passwords/${id}`);
 	},
 
-	decryptPassword: async (encryptedData) => {
-		const response = await axios.post(`${API_BASE_URL}/decrypt-password`, encryptedData);
+	decryptPassword: async (id) => {
+		const response = await api.get(`/passwords/decrypt/${id}`);
 		return response.data.password;
 	},
 };
