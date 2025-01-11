@@ -53,10 +53,7 @@ export const usePasswords = () => {
 
 			for (const pass of data) {
 				try {
-					decrypted[pass.id] = await passwordService.decryptPassword({
-						password: pass.password,
-						iv: pass.iv,
-					});
+					decrypted[pass.id] = await passwordService.decryptPassword(pass.id);
 				} catch (err) {
 					console.error('Failed to decrypt password:', err);
 				}
