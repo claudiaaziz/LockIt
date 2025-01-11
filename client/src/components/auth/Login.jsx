@@ -1,10 +1,24 @@
 import { Box, Paper, Typography, Button } from '@mui/material';
 import { Google } from '@mui/icons-material';
 import axios from 'axios';
+import { useContext } from 'react';
+import { Navigate } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 const serverUrl = process.env.REACT_APP_SERVER_URL;
 
 export default function Login() {
+	const { loggedIn, isLoading } = useContext(AuthContext);
+
+	if (isLoading || loggedIn === null) {
+		return <LoadingSpinner />;
+	}
+
+	if (loggedIn === true) {
+		return <Navigate to='/' replace />;
+	}
+
 	const handleLogin = async () => {
 		try {
 			// Get the Google OAuth URL from the server

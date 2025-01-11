@@ -16,7 +16,7 @@ export const config = {
 		redirectUrl: process.env.REDIRECT_URL,
 		clientUrl: process.env.CLIENT_URL,
 		tokenSecret: process.env.TOKEN_SECRET,
-		tokenExpiration: 36000,
+		tokenExpiration: 24 * 60 * 60 * 1000,
 		postUrl: 'https://jsonplaceholder.typicode.com/posts',
 	},
 	server: {

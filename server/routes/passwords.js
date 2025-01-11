@@ -11,7 +11,6 @@ const db = mysql2.createConnection(config.db);
 
 // Get all passwords
 router.get('/', auth, (req, res) => {
-	console.log('Hit Get Passwords');
 	db.query('SELECT * FROM passwords;', (err, result) => {
 		if (err) {
 			console.error('Error fetching passwords:', err);
