@@ -3,7 +3,7 @@ import { encrypt, decrypt } from '../utils/encryption.js';
 
 export const PasswordModel = {
 	async findAllByUser(userId) {
-		const [passwords] = await pool.query('SELECT * FROM Passwords WHERE user_id = ?', [userId]);
+		const [passwords] = await pool.query('SELECT * FROM passwords WHERE user_id = ?', [userId]);
 		return passwords;
 	},
 
@@ -12,7 +12,7 @@ export const PasswordModel = {
 		const encryptedData = encrypt(password);
 
 		const [result] = await pool.query(
-			'INSERT INTO Passwords (website, credential, password, iv, category, user_id) VALUES (?, ?, ?, ?, ?, ?)',
+			'INSERT INTO passwords (website, credential, password, iv, category, user_id) VALUES (?, ?, ?, ?, ?, ?)',
 			[website, credential, encryptedData.password, encryptedData.iv, category, userId]
 		);
 
@@ -32,7 +32,7 @@ export const PasswordModel = {
 		const encryptedData = encrypt(password);
 
 		await pool.query(
-			'UPDATE Passwords SET website = ?, credential = ?, password = ?, iv = ?, category = ? WHERE id = ? AND user_id = ?',
+			'UPDATE passwords SET website = ?, credential = ?, password = ?, iv = ?, category = ? WHERE id = ? AND user_id = ?',
 			[website, credential, encryptedData.password, encryptedData.iv, category, id, userId]
 		);
 
@@ -48,11 +48,11 @@ export const PasswordModel = {
 	},
 
 	async delete(id, userId) {
-		await pool.query('DELETE FROM Passwords WHERE id = ? AND user_id = ?', [id, userId]);
+		await pool.query('DELETE FROM passwords WHERE id = ? AND user_id = ?', [id, userId]);
 	},
 
 	async decryptPassword(id, userId) {
-		const [passwords] = await pool.query('SELECT password, iv FROM Passwords WHERE id = ? AND user_id = ?', [id, userId]);
+		const [passwords] = await pool.query('SELECT password, iv FROM passwords WHERE id = ? AND user_id = ?', [id, userId]);
 
 		if (passwords.length === 0) {
 			throw new Error('Password not found');

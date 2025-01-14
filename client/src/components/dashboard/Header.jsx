@@ -1,8 +1,7 @@
 import { Typography, Box, Paper, Avatar, Menu, MenuItem, IconButton } from '@mui/material';
 import { useState } from 'react';
-import Button from '../common/Button';
 
-export default function Header({ user, onLogout, onAddPassword }) {
+export default function Header({ user, onLogout }) {
 	const [anchorEl, setAnchorEl] = useState(null);
 
 	const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
@@ -28,11 +27,9 @@ export default function Header({ user, onLogout, onAddPassword }) {
 				borderColor: 'divider',
 			}}
 		>
-			<Typography variant='h4' component='h1' sx={{ fontWeight: 500 }}>
+			<Typography variant='h4' component='h1' sx={{ fontWeight: 500, color: 'primary.main' }}>
 				Lockit
 			</Typography>
-
-			<Button onClick={onAddPassword}>Add Password</Button>
 
 			<Box sx={{ display: 'flex', alignItems: 'center' }}>
 				{user?.picture && (

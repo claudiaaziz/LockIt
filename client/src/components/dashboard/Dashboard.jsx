@@ -1,5 +1,5 @@
 import { useState, useContext, useMemo, useEffect } from 'react';
-import { Box } from '@mui/material';
+import { Box, Fab, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { PasswordContext } from '../../context/PasswordContext';
@@ -9,6 +9,7 @@ import Header from './Header';
 import Stats from './Stats';
 import PasswordList from './PasswordList';
 import AddPasswordModal from './AddPasswordModal';
+import { Add as AddIcon } from '@mui/icons-material';
 
 export default function Dashboard() {
 	const { passwords, decryptedPasswords, loading, loadPasswords } = useContext(PasswordContext);
@@ -49,10 +50,27 @@ export default function Dashboard() {
 	);
 
 	return (
-		<Box>
-			<Header user={user} onLogout={handleLogout} onAddPassword={() => setIsAddModalOpen(true)} />
+		<Box sx={{ position: 'relative', minHeight: '100vh' }}>
+			<Header user={user} onLogout={handleLogout} />
 			<Stats loading={loading} stats={stats} />
-			<PasswordList />
+			<PasswordList onAddPassword={() => setIsAddModalOpen(true)} />
+			<Tooltip title='Add Password'>
+				<Fab
+					color='primary'
+					onClick={() => setIsAddModalOpen(true)}
+					sx={{
+						position: 'fixed',
+						bottom: 32,
+						right: 32,
+						backgroundColor: 'primary.dark',
+						'&:hover': {
+							backgroundColor: 'primary.main',
+						},
+					}}
+				>
+					<AddIcon />
+				</Fab>
+			</Tooltip>
 			<AddPasswordModal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
 		</Box>
 	);
