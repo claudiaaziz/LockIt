@@ -50,12 +50,30 @@ export default function Header({ user, onLogout }) {
 								horizontal: 'right',
 							}}
 						>
-							<MenuItem sx={{ minWidth: 150, cursor: 'default' }}>
+							<MenuItem
+								sx={{
+									minWidth: 150,
+									cursor: 'default',
+									'&:hover': {
+										backgroundColor: 'transparent',
+									},
+								}}
+							>
 								<Typography variant='body2' color='text.secondary'>
 									{user.name}
 								</Typography>
 							</MenuItem>
-							<MenuItem onClick={handleLogout} sx={{ minWidth: 150 }}>
+							<MenuItem
+								onClick={handleLogout}
+								sx={{
+									minWidth: 150,
+									'&:hover': {
+										'& .MuiTypography-root': {
+											color: 'primary.main',
+										},
+									},
+								}}
+							>
 								<Typography variant='body2' color='text.secondary'>
 									Logout
 								</Typography>

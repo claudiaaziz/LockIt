@@ -6,7 +6,7 @@ export const theme = createTheme({
 		primary: {
 			main: '#FADADD',
 			light: '#FDECEF',
-			dark: '#F8B7C5',
+			dark: '#F4C2C2',
 		},
 		secondary: {
 			main: '#EC4899',
@@ -110,6 +110,16 @@ export const theme = createTheme({
 			styleOverrides: {
 				paper: {
 					backgroundColor: '#18181B',
+				},
+			},
+		},
+		MuiCssBaseline: {
+			styleOverrides: {
+				'*': {
+					userSelect: 'none',
+				},
+				'input, textarea, [contenteditable="true"]': {
+					userSelect: 'text',
 				},
 			},
 		},

@@ -62,9 +62,9 @@ export default function Dashboard() {
 						position: 'fixed',
 						bottom: 32,
 						right: 32,
-						backgroundColor: 'primary.dark',
+						backgroundColor: 'primary.main',
 						'&:hover': {
-							backgroundColor: 'primary.main',
+							backgroundColor: 'primary.dark',
 						},
 					}}
 				>

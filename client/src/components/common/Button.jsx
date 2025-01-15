@@ -9,11 +9,11 @@ const buttonStyles = {
 			textTransform: 'none',
 			borderRadius: 2,
 			backgroundColor: 'primary.main',
-			color: '#4A4A4A',
-			fontWeight: 500,
+			color: 'black',
+			fontWeight: '500',
 			border: '1px solid rgba(255, 182, 193, 0.3)',
 			'&:hover': {
-				backgroundColor: '#FFC0CB',
+				backgroundColor: 'primary.dark',
 				boxShadow: '0 2px 8px rgba(255, 182, 193, 0.3)',
 			},
 		},
@@ -24,7 +24,7 @@ const buttonStyles = {
 			textTransform: 'none',
 			color: 'text.secondary',
 			'&:hover': {
-				color: '#FFC0CB',
+				color: 'primary.dark',
 				backgroundColor: 'transparent',
 			},
 		},

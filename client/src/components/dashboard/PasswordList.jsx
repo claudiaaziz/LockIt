@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo, useContext } from 'react';
-import { Box, Grid, Typography, InputAdornment, TextField, Button, Skeleton } from '@mui/material';
-import { Search, LockOpen } from '@mui/icons-material';
+import { useState, useMemo, useContext } from 'react';
+import { Box, Grid, Typography, InputAdornment, TextField, Button, Skeleton, Select, MenuItem, FormControl } from '@mui/material';
+import { Search, LockOpen, FilterList } from '@mui/icons-material';
 import { passwordService } from '../../services/passwordService';
 import EditPasswordModal from './EditPasswordModal';
 import PasswordCard from './PasswordCard';
@@ -8,9 +8,10 @@ import { PasswordContext } from '../../context/PasswordContext';
 import toast from 'react-hot-toast';
 
 const PasswordList = ({ onAddPassword }) => {
-	const { passwords, setPasswords, decryptedPasswords, setDecryptedPasswords, loading } = useContext(PasswordContext);
+	const { passwords, setPasswords, decryptedPasswords, loading } = useContext(PasswordContext);
 
 	const [searchTerm, setSearchTerm] = useState('');
+	const [selectedCategory, setSelectedCategory] = useState('all');
 	const [showPassword, setShowPassword] = useState({});
 	const [editingPassword, setEditingPassword] = useState(null);
 
@@ -32,14 +33,21 @@ const PasswordList = ({ onAddPassword }) => {
 	// Memoize filtered passwords to prevent unnecessary re-renders
 	const filteredPasswords = useMemo(() => {
 		const searchLower = searchTerm.toLowerCase().trim();
-		return searchLower === ''
-			? passwords
-			: passwords.filter(
-					(password) =>
-						(password?.website?.toLowerCase() || '').includes(searchLower) ||
-						(password?.username?.toLowerCase() || '').includes(searchLower)
-			  );
-	}, [passwords, searchTerm]);
+
+		return passwords.filter((password) => {
+			// Search filter
+			const matchesSearch =
+				searchLower === '' ||
+				(password?.website?.toLowerCase() || '').includes(searchLower) ||
+				(password?.credential?.toLowerCase() || '').includes(searchLower);
+
+			// Category filter
+			const matchesCategory = selectedCategory === 'all' || password.category === selectedCategory;
+
+			// Return true only if both conditions are met
+			return matchesSearch && matchesCategory;
+		});
+	}, [passwords, searchTerm, selectedCategory]);
 
 	const handleDelete = async (id) => {
 		try {
@@ -84,29 +92,103 @@ const PasswordList = ({ onAddPassword }) => {
 
 	return (
 		<Box>
-			<TextField
-				fullWidth
-				variant='outlined'
-				placeholder='Search by website or username...'
-				value={searchTerm}
-				onChange={(e) => setSearchTerm(e.target.value)}
+			<Box
 				sx={{
 					mb: 3,
-					'& .MuiOutlinedInput-root': {
-						backgroundColor: 'background.paper',
-						'&:hover': {
-							backgroundColor: '#27272A',
+					display: 'flex',
+					gap: 2,
+					alignItems: 'flex-start',
+				}}
+			>
+				<TextField
+					fullWidth
+					variant='outlined'
+					placeholder='Search by website or username...'
+					value={searchTerm}
+					onChange={(e) => setSearchTerm(e.target.value)}
+					sx={{
+						flex: 8,
+						'& .MuiOutlinedInput-root': {
+							backgroundColor: 'background.paper',
+							'&:hover': {
+								backgroundColor: '#27272A',
+							},
 						},
-					},
-				}}
-				InputProps={{
-					startAdornment: (
-						<InputAdornment position='start'>
-							<Search sx={{ color: 'text.secondary' }} />
-						</InputAdornment>
-					),
-				}}
-			/>
+					}}
+					InputProps={{
+						startAdornment: (
+							<InputAdornment position='start'>
+								<Search sx={{ color: 'text.secondary' }} />
+							</InputAdornment>
+						),
+					}}
+				/>
+				<FormControl sx={{ flex: 1 }}>
+					<Select
+						value={selectedCategory}
+						onChange={(e) => setSelectedCategory(e.target.value)}
+						displayEmpty
+						variant='outlined'
+						startAdornment={<FilterList sx={{ mr: 1, color: 'text.secondary' }} />}
+						sx={{
+							backgroundColor: 'background.paper',
+							width: '100%',
+							'&:hover': {
+								backgroundColor: '#27272A',
+							},
+							'& .Mui-selected': {
+								color: 'primary.main !important',
+							},
+						}}
+					>
+						<MenuItem
+							value='all'
+							sx={{
+								'&:hover': { color: 'primary.main' },
+								'&.Mui-selected': { color: 'primary.main' },
+							}}
+						>
+							All
+						</MenuItem>
+						<MenuItem
+							value='social'
+							sx={{
+								'&:hover': { color: 'primary.main' },
+								'&.Mui-selected': { color: 'primary.main' },
+							}}
+						>
+							Social
+						</MenuItem>
+						<MenuItem
+							value='finance'
+							sx={{
+								'&:hover': { color: 'primary.main' },
+								'&.Mui-selected': { color: 'primary.main' },
+							}}
+						>
+							Finance
+						</MenuItem>
+						<MenuItem
+							value='work'
+							sx={{
+								'&:hover': { color: 'primary.main' },
+								'&.Mui-selected': { color: 'primary.main' },
+							}}
+						>
+							Work
+						</MenuItem>
+						<MenuItem
+							value='personal'
+							sx={{
+								'&:hover': { color: 'primary.main' },
+								'&.Mui-selected': { color: 'primary.main' },
+							}}
+						>
+							Personal
+						</MenuItem>
+					</Select>
+				</FormControl>
+			</Box>
 
 			{filteredPasswords.length === 0 ? (
 				<Box
