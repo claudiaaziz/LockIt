@@ -12,6 +12,9 @@ const buttonStyles = {
 			color: 'black',
 			fontWeight: '500',
 			border: '1px solid rgba(255, 182, 193, 0.3)',
+			display: 'flex',
+			gap: 1,
+			alignItems: 'center',
 			'&:hover': {
 				backgroundColor: 'primary.dark',
 				boxShadow: '0 2px 8px rgba(255, 182, 193, 0.3)',
@@ -25,6 +28,19 @@ const buttonStyles = {
 			color: 'text.secondary',
 			'&:hover': {
 				color: 'primary.dark',
+				backgroundColor: 'transparent',
+			},
+		},
+	},
+	outlined: {
+		variant: 'outlined',
+		sx: {
+			textTransform: 'none',
+			borderRadius: 2,
+			color: 'primary.main',
+			borderColor: 'primary.main',
+			'&:hover': {
+				borderColor: 'primary.dark',
 				backgroundColor: 'transparent',
 			},
 		},

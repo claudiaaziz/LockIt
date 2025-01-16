@@ -15,6 +15,8 @@ export const AuthContextProvider = ({ children }) => {
 			const {
 				data: { loggedIn: logged_in, user },
 			} = await axios.get(`${serverUrl}/auth/logged_in`);
+			console.log('checkLoginState 🩷 user:', user);
+
 			setLoggedIn(logged_in);
 			user && setUser(user);
 		} catch (err) {

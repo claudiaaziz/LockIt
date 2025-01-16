@@ -19,9 +19,9 @@ export default function Dashboard() {
 
 	const handleLogout = async () => {
 		try {
-			await authService.logout();
 			setLoggedIn(false);
 			setUser(null);
+			await authService.logout();
 			navigate('/login');
 		} catch (error) {
 			console.error('Logout failed:', error);
@@ -29,8 +29,10 @@ export default function Dashboard() {
 	};
 
 	useEffect(() => {
-		loadPasswords();
-	}, []);
+		if (user) {
+			loadPasswords();
+		}
+	}, [user]);
 
 	const stats = useMemo(
 		() => ({

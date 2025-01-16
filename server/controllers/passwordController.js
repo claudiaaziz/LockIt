@@ -3,6 +3,7 @@ import { PasswordModel } from '../models/Password.js';
 export const passwordController = {
 	async getPasswords(req, res) {
 		try {
+			console.log('getPasswords 🩷 req.user:', req.user);
 			const userId = req.user.id; // From auth middleware
 			const passwords = await PasswordModel.findAllByUser(userId);
 			res.json(passwords);

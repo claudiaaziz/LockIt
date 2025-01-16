@@ -1,15 +1,16 @@
-import { Box, Paper, Typography, Button } from '@mui/material';
+import { Box, Typography, Divider } from '@mui/material';
 import { Google } from '@mui/icons-material';
-import axios from 'axios';
+import Button from '../common/Button';
+import { authService } from '../../services/authService';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
-import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import LoadingSpinner from '../common/LoadingSpinner';
-
-const serverUrl = process.env.REACT_APP_SERVER_URL;
+import axios from 'axios';
 
 export default function Login() {
-	const { loggedIn, isLoading } = useContext(AuthContext);
+	const navigate = useNavigate();
+	const { setLoggedIn, setUser, isLoading, loggedIn } = useContext(AuthContext);
 
 	if (isLoading || loggedIn === null) {
 		return <LoadingSpinner />;
@@ -19,16 +20,27 @@ export default function Login() {
 		return <Navigate to='/' replace />;
 	}
 
-	const handleLogin = async () => {
+	const handleGoogleLogin = async () => {
 		try {
 			// Get the Google OAuth URL from the server
 			const {
 				data: { url },
-			} = await axios.get(`${serverUrl}/auth/url`);
+			} = await axios.get(`${process.env.REACT_APP_SERVER_URL}/auth/url`);
 			// Redirect the user to the Google OAuth URL
 			window.location.assign(url);
 		} catch (err) {
-			console.error('Login error:', err);
+			console.error('Login failed:', err);
+		}
+	};
+
+	const handleDemoLogin = async () => {
+		try {
+			const { user } = await authService.demoLogin();
+			setLoggedIn(true);
+			setUser(user);
+			navigate('/');
+		} catch (error) {
+			console.error('Demo login failed:', error);
 		}
 	};
 
@@ -37,42 +49,55 @@ export default function Login() {
 			sx={{
 				height: '100vh',
 				display: 'flex',
+				flexDirection: 'column',
 				alignItems: 'center',
 				justifyContent: 'center',
-				bgcolor: 'background.default',
+				gap: 3,
 			}}
 		>
-			<Paper
-				elevation={0}
-				sx={{
-					p: 4,
-					width: '100%',
-					maxWidth: 400,
-					textAlign: 'center',
-					borderRadius: 2,
-					border: '1px solid',
-					borderColor: 'divider',
-				}}
-			>
-				<Typography variant='h4' component='h1' sx={{ mb: 4, fontWeight: 500 }}>
-					Welcome to Lockit
-				</Typography>
+			<Typography variant='h3' component='h1' sx={{ fontWeight: 500, color: 'primary.main' }}>
+				Lockit
+			</Typography>
+
+			<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%', maxWidth: 400 }}>
 				<Button
-					variant='outlined'
-					color='primary'
-					size='large'
+					onClick={handleGoogleLogin}
 					startIcon={<Google />}
-					onClick={handleLogin}
 					sx={{
-						px: 4,
 						py: 1.5,
-						textTransform: 'none',
-						fontSize: '1.1rem',
+						fontSize: '1rem',
 					}}
 				>
-					Sign in with Google
+					Continue with Google
 				</Button>
-			</Paper>
+
+				<Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+					<Divider sx={{ flex: 1 }} />
+					<Typography variant='body2' color='text.secondary'>
+						or
+					</Typography>
+					<Divider sx={{ flex: 1 }} />
+				</Box>
+
+				<Button
+					onClick={handleDemoLogin}
+					variant='outlined'
+					sx={{
+						py: 1.5,
+						borderStyle: 'dashed',
+						fontSize: '1rem',
+						'&:hover': {
+							borderStyle: 'dashed',
+						},
+					}}
+				>
+					Try Demo Version
+				</Button>
+			</Box>
+
+			<Typography variant='body2' color='text.secondary' sx={{ mt: 2 }}>
+				No sign up required for demo
+			</Typography>
 		</Box>
 	);
 }

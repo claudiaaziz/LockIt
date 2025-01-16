@@ -3,6 +3,7 @@ import { encrypt, decrypt } from '../utils/encryption.js';
 
 export const PasswordModel = {
 	async findAllByUser(userId) {
+		console.log('findAllByUser 🩷 userId:', userId);
 		const [passwords] = await pool.query('SELECT * FROM passwords WHERE user_id = ?', [userId]);
 		return passwords;
 	},

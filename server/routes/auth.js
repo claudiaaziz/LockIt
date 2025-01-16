@@ -92,4 +92,29 @@ router.post('/logout', (_, res) => {
 	res.clearCookie('token').json({ message: 'Logged out' });
 });
 
+router.post('/demo-login', async (req, res) => {
+	try {
+		const demoUser = {
+			id: 999,
+			name: 'Demo User',
+			email: 'demo@example.com',
+			picture: 'https://lh3.googleusercontent.com/demo_picture',
+		};
+
+		const token = jwt.sign({ userId: demoUser.id }, config.auth.tokenSecret, {
+			expiresIn: '24h',
+		});
+
+		res.cookie('token', token, {
+			httpOnly: true,
+			maxAge: config.auth.tokenExpiration,
+		});
+
+		res.json({ user: demoUser });
+	} catch (error) {
+		console.error('Demo login failed:', error);
+		res.status(500).json({ error: 'Demo login failed' });
+	}
+});
+
 export default router;
