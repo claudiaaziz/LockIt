@@ -47,25 +47,48 @@ export default function Login() {
 	return (
 		<Box
 			sx={{
-				height: '100vh',
+				minHeight: '100vh',
 				display: 'flex',
 				flexDirection: 'column',
 				alignItems: 'center',
 				justifyContent: 'center',
 				gap: 3,
+				px: { xs: 2, sm: 3 },
 			}}
 		>
-			<Typography variant='h3' component='h1' sx={{ fontWeight: 500, color: 'primary.main' }}>
+			<Typography
+				variant='h3'
+				component='h1'
+				sx={{
+					fontWeight: 500,
+					color: 'primary.main',
+					fontSize: { xs: '2rem', sm: '3rem' },
+				}}
+			>
 				Lockit
 			</Typography>
 
-			<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%', maxWidth: 400 }}>
+			<Box
+				sx={{
+					display: 'flex',
+					flexDirection: 'column',
+					gap: 2,
+					width: '100%',
+					maxWidth: { xs: '100%', sm: 400 },
+				}}
+			>
 				<Button
 					onClick={handleGoogleLogin}
 					startIcon={<Google />}
+					variant='primary'
 					sx={{
 						py: 1.5,
-						fontSize: '1rem',
+						fontSize: { xs: '0.9rem', sm: '1rem' },
+						backgroundColor: 'primary.main',
+						color: 'black',
+						'&:hover': {
+							backgroundColor: 'primary.dark',
+						},
 					}}
 				>
 					Continue with Google
@@ -85,7 +108,7 @@ export default function Login() {
 					sx={{
 						py: 1.5,
 						borderStyle: 'dashed',
-						fontSize: '1rem',
+						fontSize: { xs: '0.9rem', sm: '1rem' },
 						'&:hover': {
 							borderStyle: 'dashed',
 						},
@@ -95,7 +118,15 @@ export default function Login() {
 				</Button>
 			</Box>
 
-			<Typography variant='body2' color='text.secondary' sx={{ mt: 2 }}>
+			<Typography
+				variant='body2'
+				color='text.secondary'
+				sx={{
+					mt: 2,
+					textAlign: 'center',
+					px: 2,
+				}}
+			>
 				No sign up required for demo
 			</Typography>
 		</Box>

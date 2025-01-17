@@ -102,7 +102,7 @@ router.post('/demo-login', async (req, res) => {
 			google_id: 'demo@example.com',
 		};
 
-		// Create a session token that matches our OAuth flow
+		// Create a session token that matches OAuth flow
 		const token = jwt.sign({ user: demoUser }, config.auth.tokenSecret, {
 			expiresIn: config.auth.tokenExpiration,
 		});

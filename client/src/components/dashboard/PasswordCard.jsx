@@ -3,6 +3,7 @@ import { Visibility, VisibilityOff, ContentCopy, Edit, Delete } from '@mui/icons
 import { calculatePasswordStrength, getPasswordStrengthLabel } from '../../utils/passwordStrength';
 
 const PasswordCard = ({ password, decryptedPassword, showPassword, onTogglePassword, onCopy, onEdit, onDelete }) => {
+	console.log('PasswordCard 🩷 password:', password);
 	const handleCopy = () => onCopy(decryptedPassword);
 
 	return (

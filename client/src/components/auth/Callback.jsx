@@ -2,7 +2,7 @@ import { useEffect, useRef, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
-import { Box, CircularProgress } from '@mui/material';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 const serverUrl = process.env.REACT_APP_SERVER_URL;
 
@@ -33,16 +33,5 @@ export default function Callback() {
 		handleCallback();
 	}, [checkLoginState, loggedIn, navigate]);
 
-	return (
-		<Box
-			sx={{
-				height: '100vh',
-				display: 'flex',
-				alignItems: 'center',
-				justifyContent: 'center',
-			}}
-		>
-			<CircularProgress />
-		</Box>
-	);
+	return <LoadingSpinner />;
 }

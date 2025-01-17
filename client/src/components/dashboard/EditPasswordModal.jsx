@@ -69,11 +69,7 @@ const EditPasswordModal = ({ open, onClose, passwordData }) => {
 				...formData,
 			});
 
-			setPasswords(
-				passwords.map((password) =>
-					password.id === passwordData.id ? { ...updatedPassword, id: passwordData.id } : password
-				)
-			);
+			setPasswords(passwords.map((password) => (password.id === passwordData.id ? updatedPassword : password)));
 
 			setDecryptedPasswords({
 				...decryptedPasswords,

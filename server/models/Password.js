@@ -17,18 +17,13 @@ export const PasswordModel = {
 			[website, credential, encryptedData.password, encryptedData.iv, category, userId]
 		);
 
-		return {
-			id: result.insertId,
-			website,
-			credential,
-			category,
-			user_id: userId,
-			iv: encryptedData.iv,
-			password: encryptedData.password,
-		};
+		const [newPassword] = await pool.query('SELECT * FROM passwords WHERE id = ?', [result.insertId]);
+
+		return newPassword[0];
 	},
 
 	async update(id, passwordData, userId) {
+		console.log('update 🩷 passwordData:', passwordData);
 		const { website, credential, password, category } = passwordData;
 		const encryptedData = encrypt(password);
 
@@ -37,15 +32,9 @@ export const PasswordModel = {
 			[website, credential, encryptedData.password, encryptedData.iv, category, id, userId]
 		);
 
-		return {
-			id,
-			website,
-			credential,
-			category,
-			user_id: userId,
-			iv: encryptedData.iv,
-			password: encryptedData.password,
-		};
+		const [updatedPassword] = await pool.query('SELECT * FROM passwords WHERE id = ? AND user_id = ?', [id, userId]);
+
+		return updatedPassword[0];
 	},
 
 	async delete(id, userId) {
