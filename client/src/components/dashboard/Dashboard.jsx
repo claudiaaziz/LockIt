@@ -22,7 +22,7 @@ export default function Dashboard() {
 			setLoggedIn(false);
 			setUser(null);
 			await authService.logout();
-			navigate('/login');
+			window.location.href = '/login';
 		} catch (error) {
 			console.error('Logout failed:', error);
 		}

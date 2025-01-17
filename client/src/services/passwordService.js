@@ -3,6 +3,7 @@ import { api } from './api';
 export const passwordService = {
 	fetchPasswords: async () => {
 		try {
+			console.log('fetchPasswords 🩷');
 			const response = await api.get('/passwords');
 			return response.data;
 		} catch (error) {

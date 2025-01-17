@@ -99,15 +99,20 @@ router.post('/demo-login', async (req, res) => {
 			name: 'Demo User',
 			email: 'demo@example.com',
 			picture: 'https://lh3.googleusercontent.com/demo_picture',
+			google_id: 'demo@example.com',
 		};
 
-		const token = jwt.sign({ userId: demoUser.id }, config.auth.tokenSecret, {
-			expiresIn: '24h',
+		// Create a session token that matches our OAuth flow
+		const token = jwt.sign({ user: demoUser }, config.auth.tokenSecret, {
+			expiresIn: config.auth.tokenExpiration,
 		});
 
+		// Set cookie same as OAuth
 		res.cookie('token', token, {
 			httpOnly: true,
 			maxAge: config.auth.tokenExpiration,
+			secure: process.env.NODE_ENV === 'production',
+			sameSite: 'lax',
 		});
 
 		res.json({ user: demoUser });

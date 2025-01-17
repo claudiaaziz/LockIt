@@ -1,7 +1,7 @@
 # Lockit - Password Manager
 
 A secure password management application with Google OAuth authentication and end-to-end encryption.
-![Lockit](./client/public/lockit.png)
+![Dashboard Screenshot](.github/assets/dashboard.png)
 
 ## Features
 
